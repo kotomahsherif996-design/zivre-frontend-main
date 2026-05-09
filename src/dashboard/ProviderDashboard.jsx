@@ -634,6 +634,20 @@ const ProviderDashboard = () => {
                               📌 Landmark: {job.location_landmark}
                             </Typography>
                           )}
+                          {/* Display components if custom request */}
+                          {job.components_data && job.components_data.length > 0 && (
+                            <Box sx={{ mt: 1, pl: 2, bgcolor: '#f0fdf4', borderRadius: 1, p: 1 }}>
+                              <Typography variant="caption" fontWeight="bold" sx={{ color: '#10b981' }}>
+                                📋 Components to install:
+                              </Typography>
+                              {job.components_data.map((comp, idx) => (
+                                <Typography key={idx} variant="caption" display="block" sx={{ fontSize: '0.7rem' }}>
+                                  {comp.quantity} × {comp.name} (GHS{comp.unit_price}) = GHS{comp.subtotal}
+                                </Typography>
+                              ))}
+                            </Box>
+                          )}
+                          
                           <Typography variant="h5" fontWeight="700" sx={{ color: '#10b981', mt: 2 }}>GH₵{job.amount}</Typography>
                           <Typography variant="caption" color="success.main">
                             💵 You earn: GH₵{(job.amount * percentages.provider_percent / 100).toFixed(2)} ({percentages.provider_percent}%)
@@ -694,12 +708,26 @@ const ProviderDashboard = () => {
                             📌 Landmark: {job.location_landmark}
                           </Typography>
                         )}
-                        <Typography variant="h5" fontWeight="700" sx={{ color: '#10b981', mt: 2 }}>GH₵{job.amount}</Typography>
-                        <Typography variant="caption" color="success.main">
-                          💵 Your earnings: GH₵{(job.amount * percentages.provider_percent / 100).toFixed(2)} ({percentages.provider_percent}%)
-                        </Typography>
-                        
-                        <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
+                          {/* Display components if custom request */}
+                          {job.components_data && job.components_data.length > 0 && (
+                            <Box sx={{ mt: 1, pl: 2, bgcolor: '#f8fafc', borderRadius: 1, p: 1, border: '1px solid #e2e8f0' }}>
+                              <Typography variant="caption" fontWeight="bold">
+                                📋 Components Requested by Customer:
+                              </Typography>
+                              {job.components_data.map((comp, idx) => (
+                                <Typography key={idx} variant="caption" display="block" sx={{ fontSize: '0.7rem' }}>
+                                  {comp.quantity} × {comp.name} @ GHS{comp.unit_price} = GHS{comp.subtotal}
+                                </Typography>
+                              ))}
+                            </Box>
+                          )}
+                          
+                          <Typography variant="h5" fontWeight="700" sx={{ color: '#10b981', mt: 2 }}>GH₵{job.amount}</Typography>
+                          <Typography variant="caption" color="success.main">
+                            💵 Your earnings: GH₵{(job.amount * percentages.provider_percent / 100).toFixed(2)} ({percentages.provider_percent}%)
+                          </Typography>
+                          
+                          <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
                           {job.status === 'assigned' && (
                             <>
                               <Button
