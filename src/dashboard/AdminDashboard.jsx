@@ -1512,9 +1512,9 @@ const handleDeleteRequestPermanently = async (requestId) => {
                               📋 Components Requested:
                             </Typography>
                             {r.components_data.map((comp, idx) => (
-                              <Typography key={idx} variant="caption" display="block" sx={{ fontSize: '0.7rem', mt: 0.5 }}>
+                              <Box key={idx} component="div" sx={{ display: 'block', fontSize: '0.7rem', mt: 0.5 }}>
                                 {comp.quantity} × {comp.name} @ GHS{comp.unit_price} = GHS{comp.subtotal}
-                              </Typography>
+                              </Box>
                             ))}
                           </Box>
                         )}
@@ -1606,9 +1606,9 @@ const handleDeleteRequestPermanently = async (requestId) => {
                               📋 Components Requested:
                             </Typography>
                             {r.components_data.map((comp, idx) => (
-                              <Typography key={idx} variant="caption" display="block" sx={{ fontSize: '0.7rem', mt: 0.5 }}>
+                              <Box key={idx} component="div" sx={{ display: 'block', fontSize: '0.7rem', mt: 0.5 }}>
                                 {comp.quantity} × {comp.name} @ GHS{comp.unit_price} = GHS{comp.subtotal}
-                              </Typography>
+                              </Box>
                             ))}
                           </Box>
                         )}
