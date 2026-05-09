@@ -1479,7 +1479,7 @@ const handleDeleteRequestPermanently = async (requestId) => {
               )}
             </Card>
           )}
-
+          
           {/* Assign Providers Tab - FIXED */}
           {activeTab === 4 && (
             <Card sx={{ p: 3 }}>
@@ -1504,6 +1504,21 @@ const handleDeleteRequestPermanently = async (requestId) => {
                         <Typography variant="body2">Amount: <strong style={{ color: '#10b981' }}>GH₵{r.amount}</strong></Typography>
                         <Typography variant="body2">Provider payout: <strong style={{ color: '#10b981' }}>GH₵{r.provider_payout?.toFixed(2)} ({percentages.provider_percent}%)</strong></Typography>
                         <Typography variant="body2">📍 {r.location_address}, {r.location_city}, {r.location_region}</Typography>
+                        
+                        {/* Display components for custom requests */}
+                        {r.components_data && r.components_data.length > 0 && (
+                          <Box sx={{ mt: 1, pl: 2, bgcolor: '#fff7ed', borderRadius: 1, p: 1 }}>
+                            <Typography variant="caption" fontWeight="bold" sx={{ color: '#f59e0b' }}>
+                              📋 Components Requested:
+                            </Typography>
+                            {r.components_data.map((comp, idx) => (
+                              <Typography key={idx} variant="caption" display="block" sx={{ fontSize: '0.7rem', mt: 0.5 }}>
+                                {comp.quantity} × {comp.name} @ GHS{comp.unit_price} = GHS{comp.subtotal}
+                              </Typography>
+                            ))}
+                          </Box>
+                        )}
+                        
                         <Chip 
                           label={`Service: ${r.service_name}`} 
                           size="small" 
@@ -1552,6 +1567,7 @@ const handleDeleteRequestPermanently = async (requestId) => {
             </Card>
           )}
 
+
           {/* Assigned Jobs Tab */}
           {activeTab === 5 && (
             <Card sx={{ p: 3 }}>
@@ -1581,6 +1597,21 @@ const handleDeleteRequestPermanently = async (requestId) => {
                           <Chip label={r.status} size="small" sx={{ bgcolor: '#8b5cf615', color: '#8b5cf6' }} />
                         </Box>
                         <Typography variant="body2">📍 {r.location_address}, {r.location_city}, {r.location_region}</Typography>
+                        
+                        {/* 👇👇👇 ADD THIS CODE HERE 👇👇👇 */}
+                        {/* Display components for custom requests */}
+                        {r.components_data && r.components_data.length > 0 && (
+                          <Box sx={{ mt: 1, pl: 2, bgcolor: '#f3e8ff', borderRadius: 1, p: 1 }}>
+                            <Typography variant="caption" fontWeight="bold" sx={{ color: '#8b5cf6' }}>
+                              📋 Components Requested:
+                            </Typography>
+                            {r.components_data.map((comp, idx) => (
+                              <Typography key={idx} variant="caption" display="block" sx={{ fontSize: '0.7rem', mt: 0.5 }}>
+                                {comp.quantity} × {comp.name} @ GHS{comp.unit_price} = GHS{comp.subtotal}
+                              </Typography>
+                            ))}
+                          </Box>
+                        )}
                       </Box>
                       <Box>
                         <Button
