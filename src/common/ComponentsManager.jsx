@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { Box, Card, CardContent, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Dialog, DialogTitle, DialogContent, TextField, CircularProgress, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import {
+  Box, Card, CardContent, Typography, Button, Table, TableBody,
+  TableCell, TableContainer, TableHead, TableRow, Paper, IconButton,
+  Dialog, DialogTitle, DialogContent, DialogActions, TextField, CircularProgress,
+  FormControl, InputLabel, Select, MenuItem
+} from '@mui/material'
 import { Add, Edit, Delete } from '@mui/icons-material'
 import { getServices, getServiceComponents, addServiceComponent, updateComponent, deleteComponent } from '../api/client'
 
