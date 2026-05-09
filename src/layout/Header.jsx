@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import RoleModal from '../common/RoleModal'
 import AuthModal from '../common/AuthModal'
 import NotificationDropdown from '../common/NotificationDropdown'
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import {
   AppBar, Toolbar, Box, Button, Avatar, Menu, MenuItem, Divider,
   Typography, IconButton, Tooltip, useMediaQuery, Drawer, List,
@@ -309,6 +310,12 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {/* ✅ NOTIFICATION BELL - ALWAYS VISIBLE (Mobile + Desktop) */}
             {user && <NotificationDropdown />}
+
+            {user && user.role === 'customer' && (
+              <IconButton onClick={() => window.dispatchEvent(new CustomEvent('open_cart_drawer'))}>
+                <ShoppingCartIcon />
+              </IconButton>
+            )}
             
             {/* DESKTOP ONLY - Full navigation and user menu */}
             {!isMobile && (
