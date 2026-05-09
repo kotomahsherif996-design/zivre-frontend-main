@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Drawer, Box, Typography, IconButton, List, ListItem, Chip, Button, Divider, CircularProgress } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { getUserRequests, cancelRequest } from '../api/client'
+import { getUserRequests, cancelRequest, confirmRequestCompletion } from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 
 const CartDrawer = ({ open, onClose }) => {
@@ -15,7 +15,6 @@ const CartDrawer = ({ open, onClose }) => {
     setLoading(true)
     try {
       const res = await getUserRequests(user.id)
-      // Only active requests (not confirmed/cancelled)
       const active = res.data.filter(r => !['confirmed', 'cancelled_by_customer', 'rejected_by_admin', 'declined_by_provider'].includes(r.status))
       setRequests(active)
     } catch (err) {
@@ -42,12 +41,27 @@ const CartDrawer = ({ open, onClose }) => {
     }
   }
 
+  const handleConfirmCompletion = async (requestId) => {
+    if (!window.confirm('Confirm that the service is completed and you will pay the provider directly?')) return
+    setActionLoading(requestId)
+    try {
+      await confirmRequestCompletion(requestId)
+      alert('✅ Completion confirmed! Thank you for using Zivre!')
+      await loadRequests()
+    } catch (err) {
+      alert(err.response?.data?.error || 'Error confirming completion')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
   const getStatusChip = (status) => {
     const config = {
       pending_approval: { label: 'Pending Approval', color: '#f59e0b' },
       assigned: { label: 'Assigned', color: '#8b5cf6' },
       in_progress: { label: 'In Progress', color: '#ec4898' },
-      completed: { label: 'Waiting Confirmation', color: '#f59e0b' }
+      completed: { label: 'Waiting Confirmation', color: '#f59e0b' },
+      confirmed: { label: 'Confirmed', color: '#10b981' }
     }
     const c = config[status] || { label: status, color: '#64748b' }
     return <Chip label={c.label} size="small" sx={{ bgcolor: `${c.color}15`, color: c.color }} />
@@ -88,9 +102,18 @@ const CartDrawer = ({ open, onClose }) => {
                   <Typography fontWeight="700" sx={{ color: '#10b981' }}>GHS{req.amount.toFixed(2)}</Typography>
                 </Box>
                 {req.provider_name && <Typography variant="caption">Provider: {req.provider_name} ({req.provider_phone})</Typography>}
+                
+                {/* Cancel button for pending/assigned */}
                 {(req.status === 'pending_approval' || req.status === 'assigned') && (
                   <Button size="small" variant="outlined" color="error" onClick={() => handleCancel(req.id)} disabled={actionLoading === req.id} sx={{ mt: 1 }}>
                     {actionLoading === req.id ? <CircularProgress size={16} /> : 'Cancel Request'}
+                  </Button>
+                )}
+
+                {/* Confirm button for completed waiting confirmation */}
+                {req.status === 'completed' && !req.customer_confirmed && (
+                  <Button size="small" variant="contained" onClick={() => handleConfirmCompletion(req.id)} disabled={actionLoading === req.id} sx={{ mt: 1, bgcolor: '#10b981' }}>
+                    {actionLoading === req.id ? <CircularProgress size={16} sx={{ color: 'white' }} /> : 'Confirm Completion & Pay Provider'}
                   </Button>
                 )}
               </ListItem>
