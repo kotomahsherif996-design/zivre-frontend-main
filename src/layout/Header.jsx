@@ -311,6 +311,16 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
             {/* ✅ NOTIFICATION BELL - ALWAYS VISIBLE (Mobile + Desktop) */}
             {user && <NotificationDropdown />}
 
+            {user && <NotificationDropdown />}
+            
+            {/* Message icon - all logged-in users */}
+            {user && (
+              <IconButton onClick={() => window.location.href = '/messages'}>
+                <MessageIcon />
+              </IconButton>
+            )}
+            
+            {/* Cart icon - customer only */}
             {user && user.role === 'customer' && (
               <IconButton onClick={() => window.dispatchEvent(new CustomEvent('open_cart_drawer'))}>
                 <ShoppingCartIcon />
