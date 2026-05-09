@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import RoleBasedTour from '../common/RoleBasedTour'
 import ConfirmModal from '../common/ConfirmModal'
+import ComponentsManager from '../common/ComponentsManager'
 import { TourButton, adminTourSteps } from '../common/DemoTour'
 import {
   getAdminStats, getServices, toggleServiceActive, updateService, createService,
@@ -931,6 +932,7 @@ const handleDeleteRequestPermanently = async (requestId) => {
     { label: 'Assigned Jobs', icon: <WorkIcon />, tab: 5, badge: assignedRequests.length },
     { label: 'Comments', icon: <CommentIcon />, tab: 6, badge: comments.filter(c => !c.is_approved).length },
     { label: 'Percentage Settings', icon: <PercentIcon />, tab: 7, badge: 0 },
+    { label: 'Service Components', icon: <BuildIcon />, tab: 11, badge: 0 },  // ← ADD THIS LINE
     { label: 'Payment Settings', icon: <SettingsIcon />, tab: 8, badge: 0 },
     { label: 'All Requests History', icon: <HistoryIcon />, tab: 9, badge: 0 },
     { label: 'Messages', icon: <MessageIcon />, tab: 10, badge: unreadMessagesCount, action: () => window.location.href = '/messages' },
@@ -1956,7 +1958,9 @@ const handleDeleteRequestPermanently = async (requestId) => {
             </Card>
           )}
 
-
+          {/* 👇👇👇 ADD THIS LINE HERE 👇👇👇 */}
+          {/* Service Components Tab */}
+          {activeTab === 11 && <ComponentsManager />}
 
           
           {/* Service Modal */}
