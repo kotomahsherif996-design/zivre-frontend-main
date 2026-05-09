@@ -15,7 +15,10 @@ const CartDrawer = ({ open, onClose }) => {
     setLoading(true)
     try {
       const res = await getUserRequests(user.id)
-      const active = res.data.filter(r => !['confirmed', 'cancelled_by_customer', 'rejected_by_admin', 'declined_by_provider'].includes(r.status))
+      const active = res.data
+        .filter(r => !['confirmed','cancelled_by_customer','rejected_by_admin','declined_by_provider'].includes(r.status))
+        .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 20);
       setRequests(active)
     } catch (err) {
       console.error(err)
