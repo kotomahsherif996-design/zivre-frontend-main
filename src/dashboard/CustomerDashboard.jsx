@@ -26,7 +26,6 @@ import {
   Home as HomeIcon, Build as BuildIcon, Person as PersonIcon
 } from '@mui/icons-material'
 import PaymentFlier from '../common/PaymentFlier'
-import MessageIcon from '@mui/icons-material/Message'
 import CustomServiceModal from '../common/CustomServiceModal'
 import Header from '../layout/Header'
 import { DashboardSkeleton, ServicesGridSkeleton } from '../common/LoadingSkeleton'
