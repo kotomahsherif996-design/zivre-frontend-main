@@ -428,13 +428,16 @@ const UserReferralDashboard = () => {
               <Grid size={{ xs: 12, md: 6 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <WalletIcon sx={{ fontSize: 48 }} />
-                  <Box>
-                    <Typography variant="body2" sx={{ opacity: 0.9 }}>Commission Balance</Typography>
-                    <Typography variant="h3" fontWeight="800">GHS{myInfo?.commission_balance?.toFixed(2)}</Typography>
-                    <Typography variant="caption" sx={{ opacity: 0.8 }}>
-                      Total Earned: GHS{myInfo?.total_earned?.toFixed(2)}
-                    </Typography>
-                  </Box>
+                <Box>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>Commission Balance</Typography>
+                  <Typography variant="h3" fontWeight="800">GHS{myInfo?.commission_balance?.toFixed(2)}</Typography>
+                  <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                    Total Earned: GHS{myInfo?.total_earned?.toFixed(2)}
+                  </Typography>
+                  <Typography variant="caption" sx={{ opacity: 0.8, mt: 1 }}>
+                    Minimum withdrawal: GHS{kpis?.withdrawal_threshold || 20}
+                  </Typography>
+                </Box>
                 </Box>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
