@@ -24,6 +24,13 @@ import {
 } from '@mui/icons-material'
 import PaymentFlier from '../common/PaymentFlier'
 import Header from '../layout/Header'
+import BottomNav from '../common/BottomNav'
+import HomeIcon from '@mui/icons-material/Home'
+import WorkIcon from '@mui/icons-material/Work'
+import HistoryIcon from '@mui/icons-material/History'
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'
+import MessageIcon from '@mui/icons-material/Message'
+import PersonIcon from '@mui/icons-material/Person'
 import { DashboardSkeleton } from '../common/LoadingSkeleton'
 
 const drawerWidth = 280
@@ -437,6 +444,13 @@ const ProviderDashboard = () => {
     { label: ' Profile Settings', icon: <SettingsIcon />, tab: 4, badge: 0 },
   ]
 
+  const bottomTabs = [
+    { label: 'Available', icon: <WorkIcon />, tabIndex: 0 },
+    { label: 'My Jobs', icon: <HistoryIcon />, tabIndex: 1 },
+    { label: 'Earnings', icon: <TrendingUpIcon />, tabIndex: 2 },
+    { label: 'Messages', icon: <MessageIcon />, tabIndex: 3 },
+    { label: 'Profile', icon: <PersonIcon />, tabIndex: 4 }
+  ]
   const drawer = (
     <Box sx={{ height: '100%', bgcolor: 'white' }}>
       <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0' }}>
@@ -528,7 +542,7 @@ const ProviderDashboard = () => {
           </Drawer>
         </Box>
 
-        <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 3 }, width: { md: `calc(100% - ${drawerWidth}px)` } }}>
+        <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 3 }, pb: { xs: 8, md: 3 }, width: { md: `calc(100% - ${drawerWidth}px)` } }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               {isMobile && (
@@ -895,6 +909,13 @@ const ProviderDashboard = () => {
                 Go to Profile Settings
               </Button>
             </Card>
+          )}
+          {isMobile && (
+            <BottomNav 
+              tabs={bottomTabs} 
+              activeTab={activeTab} 
+              onChange={handleTabChange} 
+            />
           )}
         </Box>
       </Box>
