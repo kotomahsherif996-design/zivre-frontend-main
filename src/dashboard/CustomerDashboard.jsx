@@ -24,6 +24,11 @@ import {
   Phone as PhoneIcon, Close as CloseIcon
 } from '@mui/icons-material'
 import PaymentFlier from '../common/PaymentFlier'
+import BottomNav from '../common/BottomNav'
+import HomeIcon from '@mui/icons-material/Home'
+import BuildIcon from '@mui/icons-material/Build'
+import MessageIcon from '@mui/icons-material/Message'
+import PersonIcon from '@mui/icons-material/Person'
 import CustomServiceModal from '../common/CustomServiceModal'
 import Header from '../layout/Header'
 import { DashboardSkeleton, ServicesGridSkeleton } from '../common/LoadingSkeleton'
@@ -92,7 +97,14 @@ const CustomerDashboard = () => {
   const [totalSpent, setTotalSpent] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
   const [customModalOpen, setCustomModalOpen] = useState(false)
-  
+
+
+  const bottomTabs = [
+  { label: 'Home', icon: <HomeIcon />, tabIndex: 0 },
+  { label: 'Services', icon: <BuildIcon />, tabIndex: 1 },
+  { label: 'Messages', icon: <MessageIcon />, tabIndex: 3 },
+  { label: 'Profile', icon: <PersonIcon />, tabIndex: 4 }
+]
   // Handle window resize for mobile detection
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768)
@@ -543,7 +555,7 @@ const CustomerDashboard = () => {
           </Drawer>
         </Box>
 
-        <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 3 }, width: { md: `calc(100% - ${drawerWidth}px)` } }}>
+          <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 3 }, pb: { xs: 8, md: 3 }, width: { md: `calc(100% - ${drawerWidth}px)` } }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               {isMobile && (
@@ -825,6 +837,13 @@ const CustomerDashboard = () => {
               </Button>
             </DialogActions>
           </Dialog>
+          {isMobile && (
+            <BottomNav 
+              tabs={bottomTabs} 
+              activeTab={activeTab} 
+              onChange={handleTabChange} 
+            />
+          )}
         </Box>
       </Box>
       <RoleBasedTour />
