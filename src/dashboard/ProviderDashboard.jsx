@@ -31,7 +31,6 @@ import WorkIcon from '@mui/icons-material/Work'
 import HistoryIcon from '@mui/icons-material/History'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import MessageIcon from '@mui/icons-material/Message'
-import PersonIcon from '@mui/icons-material/Person'
 import { DashboardSkeleton } from '../common/LoadingSkeleton'
 
 const drawerWidth = 280
