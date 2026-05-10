@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import BottomNav from '../common/BottomNav'
 import { useAuth } from '../contexts/AuthContext'
 import RoleBasedTour from '../common/RoleBasedTour'
 import { TourButton, providerTourSteps } from '../common/DemoTour'
@@ -20,11 +21,11 @@ import {
   Refresh as RefreshIcon, LocationOn as LocationIcon,
   Star as StarIcon, Pending as PendingIcon, Message as MessageIcon,
   Paid as PaidIcon, TrendingUp as TrendingUpIcon, Build as BuildIcon,
-  Search as SearchIcon, Phone as PhoneIcon, Close as CloseIcon
+  Search as SearchIcon, Phone as PhoneIcon, Close as CloseIcon,
+  Home as HomeIcon, Person as PersonIcon
 } from '@mui/icons-material'
 import PaymentFlier from '../common/PaymentFlier'
 import Header from '../layout/Header'
-import BottomNav from '../common/BottomNav'
 import HomeIcon from '@mui/icons-material/Home'
 import WorkIcon from '@mui/icons-material/Work'
 import HistoryIcon from '@mui/icons-material/History'
