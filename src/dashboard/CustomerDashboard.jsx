@@ -21,14 +21,12 @@ import {
   History as HistoryIcon, Settings as SettingsIcon,
   Refresh as RefreshIcon, Star as StarIcon, StarBorder as StarBorderIcon,
   LocationOn as LocationIcon, Message as MessageIcon, Search as SearchIcon,
-  Phone as PhoneIcon, Close as CloseIcon
+  Phone as PhoneIcon, Close as CloseIcon,
+  Home as HomeIcon, Build as BuildIcon, Person as PersonIcon
 } from '@mui/icons-material'
 import PaymentFlier from '../common/PaymentFlier'
 import BottomNav from '../common/BottomNav'
-import HomeIcon from '@mui/icons-material/Home'
-import BuildIcon from '@mui/icons-material/Build'
 import MessageIcon from '@mui/icons-material/Message'
-import PersonIcon from '@mui/icons-material/Person'
 import CustomServiceModal from '../common/CustomServiceModal'
 import Header from '../layout/Header'
 import { DashboardSkeleton, ServicesGridSkeleton } from '../common/LoadingSkeleton'
