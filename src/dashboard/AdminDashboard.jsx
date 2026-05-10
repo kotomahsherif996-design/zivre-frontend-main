@@ -12,7 +12,9 @@ import {
   getAdminComments, toggleCommentApproval, adminDeleteComment,
   getPaymentSettings, updatePaymentSettings,
   getPercentages, updatePercentages,
-  getUserFullDetails, rejectRequest, deleteRequestPermanently
+  getUserFullDetails, rejectRequest, deleteRequestPermanently,
+  getWithdrawalThreshold,
+  updateWithdrawalThreshold
 } from '../api/client'
 import {
   Box, Drawer, Typography, IconButton, Grid, Card, CardContent,
@@ -104,7 +106,9 @@ const AdminDashboard = () => {
   const [assigningRequest, setAssigningRequest] = useState(null)
   const [loadingProviders, setLoadingProviders] = useState(false)
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
-  
+
+  const [withdrawalThreshold, setWithdrawalThreshold] = useState(20)
+  const [withdrawalThresholdLoading, setWithdrawalThresholdLoading] = useState(false)
   // NEW: Separate state for each request's provider selection
   const [selectedProviderForRequest, setSelectedProviderForRequest] = useState({})
   const [providersForRequest, setProvidersForRequest] = useState({})
@@ -170,6 +174,15 @@ const AdminDashboard = () => {
     }
   }
 
+  // 👇 ADD THIS NEW FUNCTION RIGHT HERE 👇
+  const loadWithdrawalThreshold = async () => {
+    try {
+      const res = await getWithdrawalThreshold()
+      setWithdrawalThreshold(res.data.threshold)
+    } catch (err) {
+      console.error('Error loading withdrawal threshold:', err)
+    }
+  }
   // NEW: Load providers for a specific request
   const loadProvidersForRequest = async (requestId, serviceId) => {
     // ✅ Check cache first - providers don't change often
@@ -648,6 +661,7 @@ const handleDeleteRequestPermanently = async (requestId) => {
     loadUnreadCounts()
     loadPaymentSettings()
     loadPercentages()
+    loadWithdrawalThreshold()
   }, [user, loadData, loadPercentages, loadUnreadCounts])
 
   const handleViewUserDetails = async (userObj) => {
@@ -670,7 +684,29 @@ const handleDeleteRequestPermanently = async (requestId) => {
     }
   }
 
-  // ✅ FIXED: handleUpdatePercentages - uses targeted refresh
+
+  const handleUpdateWithdrawalThreshold = async () => {
+    const newThreshold = parseFloat(withdrawalThreshold)
+    if (isNaN(newThreshold) || newThreshold < 5) {
+      showToast('Threshold must be at least 5 GHS', 'error')
+      return
+    }
+    if (newThreshold > 1000) {
+      showToast('Threshold cannot exceed 1000 GHS', 'error')
+      return
+    }
+    setWithdrawalThresholdLoading(true)
+    try {
+      await updateWithdrawalThreshold(newThreshold)
+      showToast('Withdrawal threshold updated successfully', 'success')
+    } catch (err) {
+      showToast(err.response?.data?.error || 'Error updating threshold', 'error')
+    } finally {
+      setWithdrawalThresholdLoading(false)
+    }
+  }
+  
+  //  FIXED: handleUpdatePercentages - uses targeted refresh
   const handleUpdatePercentages = async () => {
       const total = percentages.provider_percent + percentages.admin_percent + percentages.site_fee_percent + (percentages.referral_pool_percent || 0)
       if (Math.abs(total - 100) > 0.01) {
@@ -1917,6 +1953,32 @@ const handleDeleteRequestPermanently = async (requestId) => {
               >
                 {paymentSettingsLoading ? <CircularProgress size={20} /> : 'Save Payment Settings'}
               </Button>
+              <Divider sx={{ my: 3 }} />
+              <Typography variant="subtitle1" fontWeight="600" sx={{ mb: 1, color: '#0f172a' }}>
+                Referral Withdrawal Minimum
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+                <TextField
+                  type="number"
+                  label="Minimum Withdrawal (GHS)"
+                  value={withdrawalThreshold}
+                  onChange={(e) => setWithdrawalThreshold(e.target.value)}
+                  size="small"
+                  sx={{ width: 200 }}
+                  inputProps={{ min: 5, step: 1 }}
+                />
+                <Button
+                  variant="contained"
+                  onClick={handleUpdateWithdrawalThreshold}
+                  disabled={withdrawalThresholdLoading}
+                  sx={{ bgcolor: '#10b981' }}
+                >
+                  {withdrawalThresholdLoading ? <CircularProgress size={24} /> : 'Save Threshold'}
+                </Button>
+              </Box>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                Customers cannot withdraw less than this amount.
+              </Typography> 
             </Card>
           )}
 
