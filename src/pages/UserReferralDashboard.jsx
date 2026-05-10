@@ -672,7 +672,7 @@ const UserReferralDashboard = () => {
             onChange={(e) => setWithdrawAmount(e.target.value)}
             margin="normal"
             required
-            inputProps={{ min: 20, max: myInfo?.commission_balance }}
+            inputProps={{ min: kpis?.withdrawal_threshold || 20, max: myInfo?.commission_balance }}
           />
           <TextField
             fullWidth
