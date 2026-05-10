@@ -204,6 +204,10 @@ export const addServiceComponent = (serviceId, data) => api.post(`/admin/service
 export const updateComponent = (componentId, data) => api.put(`/admin/components/${componentId}`, data)
 export const deleteComponent = (componentId) => api.delete(`/admin/components/${componentId}`)
 
+// ========== WITHDRAWAL THRESHOLD ==========
+export const getWithdrawalThreshold = () => api.get('/settings/withdrawal-threshold')
+export const updateWithdrawalThreshold = (threshold) => api.put('/admin/settings/withdrawal-threshold', { threshold })
+
 // ========== BOOKING DETAILS WITH OWNER NET ==========
 export const getBookingDetails = (requestId) => api.get(`/admin/requests/${requestId}`)
 export default api
