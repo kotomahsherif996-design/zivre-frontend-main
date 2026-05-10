@@ -434,9 +434,22 @@ const UserReferralDashboard = () => {
                   <Typography variant="caption" sx={{ opacity: 0.8 }}>
                     Total Earned: GHS{myInfo?.total_earned?.toFixed(2)}
                   </Typography>
-                  <Typography variant="caption" sx={{ opacity: 0.8, mt: 1 }}>
-                    Minimum withdrawal: GHS{kpis?.withdrawal_threshold || 20}
-                  </Typography>
+                  <Box sx={{ mt: 1.5, pt: 1, borderTop: '1px solid rgba(255,255,255,0.2)' }}>
+                    <Typography 
+                      variant="body2" 
+                      fontWeight="bold" 
+                      sx={{ 
+                        color: '#fbbf24', 
+                        backgroundColor: 'rgba(0,0,0,0.2)',
+                        display: 'inline-block',
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 2
+                      }}
+                    >
+                      💰 Minimum withdrawal: GHS{kpis?.withdrawal_threshold || 20}
+                    </Typography>
+                  </Box>
                 </Box>
                 </Box>
               </Grid>
