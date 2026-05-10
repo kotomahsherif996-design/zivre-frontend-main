@@ -26,10 +26,6 @@ import {
 } from '@mui/icons-material'
 import PaymentFlier from '../common/PaymentFlier'
 import Header from '../layout/Header'
-import HomeIcon from '@mui/icons-material/Home'
-import WorkIcon from '@mui/icons-material/Work'
-import HistoryIcon from '@mui/icons-material/History'
-import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import { DashboardSkeleton } from '../common/LoadingSkeleton'
 
 const drawerWidth = 280
