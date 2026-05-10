@@ -81,6 +81,18 @@ const UserReferralDashboard = () => {
     }
   }, [user])
 
+
+
+// Listen for withdrawal threshold changes (real-time)
+  useEffect(() => {
+    const handleThresholdUpdate = (event) => {
+      console.log('💰 Withdrawal threshold updated:', event.detail)
+      setKpis(prev => ({ ...prev, withdrawal_threshold: event.detail.threshold }))
+      showToast(`Withdrawal minimum changed to GHS${event.detail.threshold}`, 'info')
+    }
+    window.addEventListener('withdrawal_threshold_updated', handleThresholdUpdate)
+    return () => window.removeEventListener('withdrawal_threshold_updated', handleThresholdUpdate)
+  }, [])
   // ========== REALTIME WEBSOCKET UPDATES ==========
   useEffect(() => {
     // Handle new commission earned
@@ -131,8 +143,10 @@ const UserReferralDashboard = () => {
 
   const handleWithdrawSubmit = async () => {
     const amount = parseFloat(withdrawAmount)
-    if (isNaN(amount) || amount < 20) {
-      showToast('Minimum withdrawal amount is GHS20', 'error')
+    const threshold = kpis?.withdrawal_threshold || 20
+    
+    if (isNaN(amount) || amount < threshold) {
+      showToast(`Minimum withdrawal amount is GHS${threshold}`, 'error')
       return
     }
     if (amount > (myInfo?.commission_balance || 0)) {
@@ -143,7 +157,7 @@ const UserReferralDashboard = () => {
       showToast('Please enter your account details', 'error')
       return
     }
-
+  
     setSubmitting(true)
     try {
       await requestWithdrawal({
@@ -425,13 +439,13 @@ const UserReferralDashboard = () => {
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <Box sx={{ textAlign: 'right' }}>
-                  {myInfo?.commission_balance >= 20 && (
+                  {myInfo?.commission_balance >= (kpis?.withdrawal_threshold || 20) && (
                     <Button
                       variant="contained"
                       onClick={() => setWithdrawModalOpen(true)}
                       sx={{ bgcolor: 'white', color: '#10b981', '&:hover': { bgcolor: '#f5f5f5' } }}
                     >
-                      Request Withdrawal (Min GHS20)
+                      Request Withdrawal (Min GHS{kpis?.withdrawal_threshold || 20})
                     </Button>
                   )}
                   <Typography variant="caption" sx={{ display: 'block', mt: 1, opacity: 0.8 }}>
@@ -647,9 +661,9 @@ const UserReferralDashboard = () => {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Alert severity="info" sx={{ mb: 2, mt: 1 }}>
-            Minimum withdrawal: GHS20. Your current balance: GHS{myInfo?.commission_balance?.toFixed(2)}
-          </Alert>
+        <Alert severity="info" sx={{ mb: 2, mt: 1 }}>
+          Minimum withdrawal: GHS{kpis?.withdrawal_threshold || 20}. Your current balance: GHS{myInfo?.commission_balance?.toFixed(2)}
+        </Alert>
           <TextField
             fullWidth
             label="Amount (GHS)"
