@@ -6,12 +6,12 @@ import LoadingOverlay from '../common/LoadingOverlay'
 import {
   Dialog, DialogTitle, DialogContent, Box, Typography, TextField, Button,
   Alert, CircularProgress, IconButton, InputAdornment,
-  Chip, LinearProgress, useMediaQuery
+  Chip, LinearProgress, useMediaQuery, Paper
 } from '@mui/material'
 import {
   Visibility, VisibilityOff, CheckCircle, Cancel,
   Person, Phone, Email, Lock,
-  Share, Close as CloseIcon
+  Share, ContentCopy, Verified, Close as CloseIcon
 } from '@mui/icons-material'
 import Header from '../layout/Header'
 import Footer from '../layout/Footer'
@@ -39,6 +39,7 @@ const ReferralSignup = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loadingPercentages, setLoadingPercentages] = useState(true)
+  const [copied, setCopied] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState({
     length: false,
     uppercase: false,
@@ -69,7 +70,6 @@ const ReferralSignup = () => {
     loadData()
   }, [])
 
-  // Same validation helpers as before
   const validateEmail = (email) => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
   const validatePhone = (phone) => /^\+?[0-9]{10,15}$/.test(phone)
 
@@ -108,6 +108,14 @@ const ReferralSignup = () => {
     if (passed <= 2) return 'Weak'
     if (passed <= 4) return 'Medium'
     return 'Strong'
+  }
+
+  const handleCopyReferralCode = () => {
+    if (referralCodeFromUrl) {
+      navigator.clipboard.writeText(referralCodeFromUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -207,7 +215,6 @@ const ReferralSignup = () => {
       
       <Footer />
 
-      {/* SIGNUP MODAL – identical to AuthModal */}
       <Dialog
         open={openModal}
         onClose={() => setOpenModal(false)}
@@ -216,7 +223,39 @@ const ReferralSignup = () => {
         disableEnforceFocus
         PaperProps={{ sx: { borderRadius: 3 } }}
       >
-        <DialogTitle sx={{ textAlign: 'center', pt: 4 }}>
+        {/* Referral Banner (only if referral code exists) */}
+        {referralCodeFromUrl && (
+          <Paper
+            elevation={0}
+            sx={{
+              mx: 2,
+              mt: 2,
+              p: 1.5,
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: 'white',
+              borderRadius: 2,
+              textAlign: 'center'
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+              <Verified sx={{ fontSize: 16 }} />
+              <Typography variant="body2" fontWeight="600">
+                🎉 You Were Referred!
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mt: 0.5 }}>
+              <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                {referralCodeFromUrl}
+              </Typography>
+              <IconButton size="small" onClick={handleCopyReferralCode} sx={{ color: 'white', p: 0.5 }}>
+                <ContentCopy sx={{ fontSize: 14 }} />
+              </IconButton>
+              {copied && <Typography variant="caption">✓ Copied</Typography>}
+            </Box>
+          </Paper>
+        )}
+
+        <DialogTitle sx={{ textAlign: 'center', pt: referralCodeFromUrl ? 2 : 4 }}>
           <Typography variant="h6" fontWeight="800" sx={{ color: '#0f172a' }}>
             Create Account
           </Typography>
