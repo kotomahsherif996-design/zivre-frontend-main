@@ -13,7 +13,8 @@ import {
   Box, Drawer, Typography, IconButton, Grid, Card, CardContent,
   Button, Chip, Alert, Snackbar, CircularProgress, Avatar,
   Tooltip, Badge, Dialog, DialogTitle, DialogContent,
-  DialogActions, LinearProgress, Divider, TextField
+  DialogActions, LinearProgress, Divider, TextField,
+  FormControl, InputLabel, Select, MenuItem
 } from '@mui/material'
 import {
   Menu as MenuIcon, Dashboard as DashboardIcon, Work as WorkIcon,
@@ -581,14 +582,43 @@ const ProviderDashboard = () => {
             </Box>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
               {(activeTab === 0 || activeTab === 1) && (
-                <TextField
-                  size="small"
-                  placeholder={activeTab === 0 ? "Search available jobs..." : "Search my jobs by service or customer..."}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  slotProps={{ input: { startAdornment: <SearchIcon sx={{ color: '#94a3b8' }} /> } }}
-                  sx={{ width: isMobile ? 200 : 280, bgcolor: 'white', borderRadius: 2 }}
-                />
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+                  {activeTab === 0 ? (
+                    <TextField
+                      size="small"
+                      placeholder="Search available jobs..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      slotProps={{ input: { startAdornment: <SearchIcon sx={{ color: '#94a3b8' }} /> } }}
+                      sx={{ width: isMobile ? 200 : 280, bgcolor: 'white', borderRadius: 2 }}
+                    />
+                  ) : (
+                    <>
+                      <TextField
+                        size="small"
+                        placeholder="Search my jobs..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        slotProps={{ input: { startAdornment: <SearchIcon sx={{ color: '#94a3b8' }} /> } }}
+                        sx={{ width: isMobile ? 180 : 220, bgcolor: 'white', borderRadius: 2 }}
+                      />
+                      <FormControl size="small" sx={{ minWidth: 130 }}>
+                        <InputLabel>Status</InputLabel>
+                        <Select
+                          value={jobStatusFilter}
+                          label="Status"
+                          onChange={(e) => setJobStatusFilter(e.target.value)}
+                        >
+                          <MenuItem value="all">All</MenuItem>
+                          <MenuItem value="assigned">Assigned</MenuItem>
+                          <MenuItem value="in_progress">In Progress</MenuItem>
+                          <MenuItem value="completed">Completed (Awaiting)</MenuItem>
+                          <MenuItem value="confirmed">Confirmed (Paid)</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </>
+                  )}
+                </Box>
               )}
               <IconButton onClick={() => loadData(true)} disabled={refreshing} sx={{ bgcolor: 'white' }}>
                 {refreshing ? <CircularProgress size={24} sx={{ color: '#10b981' }} /> : <RefreshIcon />}
