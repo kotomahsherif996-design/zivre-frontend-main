@@ -124,7 +124,9 @@ const ProviderDashboard = () => {
     setActiveTab(tab)
     saveProviderState('activeTab', tab)
     setSearchTerm('')
-    // Close drawer on mobile when tab is selected
+    if (tab !== 1) {
+      setJobStatusFilter('all')   // reset filter when leaving My Jobs tab
+    }
     if (isMobile) {
       setMobileOpen(false)
     }
