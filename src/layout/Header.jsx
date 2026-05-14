@@ -19,6 +19,7 @@ import InfoIcon from '@mui/icons-material/Info'
 import QuoteIcon from '@mui/icons-material/FormatQuote'
 import PersonIcon from '@mui/icons-material/Person'
 import ShareIcon from '@mui/icons-material/Share'
+import { getUserRequests } from '../api/client'
 
 const Header = ({ onGetQuote, hideNavLinks = false }) => {
   const { user, logout } = useAuth()
@@ -29,6 +30,9 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const isMobile = useMediaQuery('(max-width:768px)')
+
+  // === CART BADGE STATE ===
+  const [activeRequestCount, setActiveRequestCount] = useState(0)
 
   const blurActiveElement = () => {
     if (document.activeElement && document.activeElement.blur) {
@@ -135,6 +139,49 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
     { label: 'About', icon: <InfoIcon />, action: () => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }) },
     { label: 'Get Quote', icon: <QuoteIcon />, action: onGetQuote },
   ]
+
+  // Fetch active request count for the cart badge
+  const fetchActiveRequestCount = async () => {
+    if (!user || user.role !== 'customer') return
+    try {
+      const res = await getUserRequests(user.id)
+      const active = res.data.filter(r => 
+        !['confirmed', 'cancelled_by_customer', 'rejected_by_admin', 'declined_by_provider'].includes(r.status)
+      )
+      setActiveRequestCount(active.length)
+    } catch (err) {
+      console.error('Error fetching active requests count:', err)
+    }
+  }
+
+  // Initial fetch and real-time event listeners
+  useEffect(() => {
+    if (user && user.role === 'customer') {
+      fetchActiveRequestCount()
+    }
+  }, [user])
+
+  useEffect(() => {
+    const handleRefresh = () => fetchActiveRequestCount()
+    if (user && user.role === 'customer') {
+      window.addEventListener('new_request', handleRefresh)
+      window.addEventListener('request_status_changed', handleRefresh)
+      window.addEventListener('request_created', handleRefresh)
+      window.addEventListener('provider_assigned', handleRefresh)
+      window.addEventListener('job_started', handleRefresh)
+      window.addEventListener('job_completed', handleRefresh)
+      window.addEventListener('customer_confirmed', handleRefresh)
+      return () => {
+        window.removeEventListener('new_request', handleRefresh)
+        window.removeEventListener('request_status_changed', handleRefresh)
+        window.removeEventListener('request_created', handleRefresh)
+        window.removeEventListener('provider_assigned', handleRefresh)
+        window.removeEventListener('job_started', handleRefresh)
+        window.removeEventListener('job_completed', handleRefresh)
+        window.removeEventListener('customer_confirmed', handleRefresh)
+      }
+    }
+  }, [user])
 
   // Listen for custom event from Hero button (Get Started)
   useEffect(() => {
@@ -318,11 +365,13 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
               </IconButton>
             )}
             
-            {/* Cart icon - customer only */}
+            {/* Cart icon - customer only with badge */}
             {user && user.role === 'customer' && (
-              <IconButton onClick={() => window.dispatchEvent(new CustomEvent('open_cart_drawer'))}>
-                <ShoppingCartIcon />
-              </IconButton>
+              <Badge badgeContent={activeRequestCount} color="error" invisible={activeRequestCount === 0}>
+                <IconButton onClick={() => window.dispatchEvent(new CustomEvent('open_cart_drawer'))}>
+                  <ShoppingCartIcon />
+                </IconButton>
+              </Badge>
             )}
             
             {/* DESKTOP ONLY - Full navigation and user menu */}
