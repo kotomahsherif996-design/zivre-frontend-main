@@ -70,6 +70,7 @@ const ProviderDashboard = () => {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0)
   const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
+  const [jobStatusFilter, setJobStatusFilter] = useState('all')
 
   // Handle window resize for mobile detection
   useEffect(() => {
@@ -99,15 +100,24 @@ const ProviderDashboard = () => {
   }, [availableJobs, searchTerm])
 
   const filteredMyJobs = useMemo(() => {
-    if (!searchTerm.trim()) return myJobs
-    const term = searchTerm.toLowerCase().trim()
-    return myJobs.filter(job => 
-      job.service_name?.toLowerCase().includes(term) ||
-      job.customer_name?.toLowerCase().includes(term) ||
-      job.location_city?.toLowerCase().includes(term) ||
-      job.location_region?.toLowerCase().includes(term)
-    )
-  }, [myJobs, searchTerm])
+    let filtered = myJobs
+    // Apply status filter
+    if (jobStatusFilter !== 'all') {
+      filtered = filtered.filter(job => job.status === jobStatusFilter)
+    }
+    // Apply search term filter
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim()
+      filtered = filtered.filter(job => 
+        job.service_name?.toLowerCase().includes(term) ||
+        job.customer_name?.toLowerCase().includes(term) ||
+        job.location_city?.toLowerCase().includes(term) ||
+        job.location_region?.toLowerCase().includes(term)
+      )
+    }
+    return filtered
+  }, [myJobs, jobStatusFilter, searchTerm])
+  
 
   // Save active tab when changed
   const handleTabChange = (tab) => {
