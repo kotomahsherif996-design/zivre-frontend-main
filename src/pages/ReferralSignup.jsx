@@ -6,7 +6,7 @@ import LoadingOverlay from '../common/LoadingOverlay'
 import {
   Dialog, DialogTitle, DialogContent, Box, Typography, TextField, Button,
   Alert, CircularProgress, IconButton, InputAdornment,
-  Chip, LinearProgress, useMediaQuery, Paper
+  Chip, LinearProgress, useMediaQuery
 } from '@mui/material'
 import {
   Visibility, VisibilityOff, CheckCircle, Cancel,
@@ -111,8 +111,8 @@ const ReferralSignup = () => {
   }
 
   const handleCopyReferralCode = () => {
-    if (referralCodeFromUrl) {
-      navigator.clipboard.writeText(referralCodeFromUrl)
+    if (formData.referral_code) {
+      navigator.clipboard.writeText(formData.referral_code)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
@@ -223,39 +223,71 @@ const ReferralSignup = () => {
         disableEnforceFocus
         PaperProps={{ sx: { borderRadius: 3 } }}
       >
-        {/* Referral Banner (only if referral code exists) */}
-        {referralCodeFromUrl && (
-          <Paper
-            elevation={0}
+        {/* Enhanced Referral Banner (only if a referral code exists) */}
+        {formData.referral_code && (
+          <Box
             sx={{
               mx: 2,
               mt: 2,
-              p: 1.5,
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              p: 2.5,
+              background: 'linear-gradient(135deg, #0f3b2c 0%, #10b981 100%)',
               color: 'white',
-              borderRadius: 2,
-              textAlign: 'center'
+              borderRadius: 3,
+              textAlign: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-              <Verified sx={{ fontSize: 16 }} />
-              <Typography variant="body2" fontWeight="600">
-                🎉 You Were Referred!
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1 }}>
+              <Typography variant="h5" sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}>
+                🎉
+              </Typography>
+              <Typography variant="h6" fontWeight="800" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                You Were Referred!
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mt: 0.5 }}>
-              <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                {referralCodeFromUrl}
+            <Typography variant="body2" sx={{ mb: 1.5, opacity: 0.9 }}>
+              Sign up now and start earning commissions from your first service.
+            </Typography>
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 1,
+                bgcolor: 'rgba(255,255,255,0.2)',
+                px: 2,
+                py: 1,
+                borderRadius: 3,
+                backdropFilter: 'blur(4px)'
+              }}
+            >
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: 'monospace',
+                  fontWeight: 'bold',
+                  letterSpacing: 1,
+                  fontSize: { xs: '0.9rem', sm: '1rem' }
+                }}
+              >
+                {formData.referral_code}
               </Typography>
-              <IconButton size="small" onClick={handleCopyReferralCode} sx={{ color: 'white', p: 0.5 }}>
-                <ContentCopy sx={{ fontSize: 14 }} />
+              <IconButton
+                size="small"
+                onClick={handleCopyReferralCode}
+                sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.2)', '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }}
+              >
+                <ContentCopy sx={{ fontSize: 18 }} />
               </IconButton>
-              {copied && <Typography variant="caption">✓ Copied</Typography>}
+              {copied && (
+                <Typography variant="caption" sx={{ color: '#d1fae5' }}>
+                  ✓ Copied
+                </Typography>
+              )}
             </Box>
-          </Paper>
+          </Box>
         )}
 
-        <DialogTitle sx={{ textAlign: 'center', pt: referralCodeFromUrl ? 2 : 4 }}>
+        <DialogTitle sx={{ textAlign: 'center', pt: formData.referral_code ? 2 : 4 }}>
           <Typography variant="h6" fontWeight="800" sx={{ color: '#0f172a' }}>
             Create Account
           </Typography>
@@ -329,12 +361,11 @@ const ReferralSignup = () => {
                 }
                 setFormData({ ...formData, referral_code: input });
               }}
-              helperText={referralCodeFromUrl ? "✓ Applied from link" : "Enter a referral code if you have one"}
+              helperText={formData.referral_code === referralCodeFromUrl && referralCodeFromUrl ? "✓ Applied from link" : "Enter a referral code if you have one"}
               InputProps={{
-                readOnly: !!referralCodeFromUrl,
                 startAdornment: <Share sx={{ fontSize: 18, mr: 0.5, color: '#94a3b8' }} />
               }}
-              sx={{ mb: 1.5, '& .MuiInputBase-root': referralCodeFromUrl ? { bgcolor: '#f0fdf4' } : {} }}
+              sx={{ mb: 1.5 }}
             />
 
             <TextField
