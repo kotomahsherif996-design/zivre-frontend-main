@@ -281,20 +281,7 @@ const UserReferralDashboard = () => {
             <Typography fontWeight="700" sx={{ color: '#10b981', display: 'block', fontSize: balanceFontSize }}>
               GHS{node.commission_balance?.toFixed(2) || '0.00'}
             </Typography>
-            {node.position && (
-              <Chip
-                label={node.position.toUpperCase()}
-                size="small"
-                sx={{ 
-                  mt: 0.5, 
-                  height: 16, 
-                  fontSize: '0.5rem',
-                  fontWeight: 600,
-                  bgcolor: `${getPositionColor(node.position)}20`,
-                  color: getPositionColor(node.position)
-                }}
-              />
-            )}
+            {/* position chip removed */}
           </Paper>
         </Box>
   
