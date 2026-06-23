@@ -245,11 +245,11 @@ const AppRoutes = () => {
 
   // KEEP BACKEND AWAKE
   useEffect(() => {
-    fetch('https://zivre-frontend.vercel.app/api/services')
+    fetch('https://zivrefaserve.app/api/services')
       .catch(() => console.log('Backend waking up...'))
     
     const keepAliveInterval = setInterval(() => {
-      fetch('https://zivre-frontend.vercel.app/api/services')
+      fetch('https://zivrefaserve.app/api/services')
         .catch(() => {})
     }, 2 * 60 * 1000)
     
