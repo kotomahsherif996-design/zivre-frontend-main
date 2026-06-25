@@ -212,9 +212,20 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
     }
   }, [])
 
+  // ===== DRAWER CONTENT (with fixed width and brand) =====
   const drawer = (
-    <Box sx={{ width: 250, p: 2 }} role="presentation">
-      <Typography variant="h6" sx={{ fontWeight: 800, color: '#10b981', mb: 2 }}>ZIVRE</Typography>
+    <Box sx={{ width: { xs: 280, sm: 300 }, p: 2.5 }} role="presentation">
+      <Typography 
+        variant="h5" 
+        sx={{ 
+          fontWeight: 800, 
+          color: '#10b981', 
+          mb: 2,
+          fontSize: { xs: '1.2rem', sm: '1.5rem' },
+        }}
+      >
+        ZIVRE
+      </Typography>
       <List>
         {!hideNavLinks && navItems.map((item) => (
           <ListItem 
@@ -385,7 +396,7 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
               </Badge>
             )}
 
-            {/* ===== NEW: Referral Icon (logged-in users) ===== */}
+            {/* ===== REFERRAL ICON (logged-in users) ===== */}
             {user && (
               <Tooltip title="Referrals">
                 <IconButton onClick={handleReferralsClick}>
