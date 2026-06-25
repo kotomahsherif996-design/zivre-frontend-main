@@ -4,6 +4,7 @@ import RoleModal from '../common/RoleModal'
 import AuthModal from '../common/AuthModal'
 import NotificationDropdown from '../common/NotificationDropdown'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
+import ShareIcon from '@mui/icons-material/Share'
 import {
   AppBar, Toolbar, Box, Button, Avatar, Menu, MenuItem, Divider,
   Typography, IconButton, Tooltip, useMediaQuery, Drawer, List,
@@ -18,7 +19,6 @@ import HomeIcon from '@mui/icons-material/Home'
 import InfoIcon from '@mui/icons-material/Info'
 import QuoteIcon from '@mui/icons-material/FormatQuote'
 import PersonIcon from '@mui/icons-material/Person'
-import ShareIcon from '@mui/icons-material/Share'
 import { getUserRequests } from '../api/client'
 
 const Header = ({ onGetQuote, hideNavLinks = false }) => {
@@ -254,7 +254,6 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
               <ListItemIcon><DashboardIcon /></ListItemIcon>
               <ListItemText primary="Dashboard" />
             </ListItem>
-            {/* FIXED: Referrals link - admin goes to /admin/referrals */}
             <ListItem 
               onClick={() => { 
                 blurActiveElement()
@@ -332,12 +331,10 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
     <>
       <AppBar position="sticky" color="default" elevation={0} sx={{ bgcolor: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #e9efec', boxShadow: '0 1px 0 rgba(10,31,26,0.02)' }}>
         <Toolbar sx={{ justifyContent: 'space-between', maxWidth: 1400, width: '100%', mx: 'auto', px: { xs: 2, md: 4 } }}>
+          
+          {/* ===== LEFT SIDE: Logo & Brand ===== */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {isMobile && (
-              <IconButton onClick={handleDrawerToggle}>
-                <MenuIcon />
-              </IconButton>
-            )}
+            {/* LEFT HAMBURGER REMOVED */}
             <Box 
               sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }} 
               onClick={() => window.location.href = '/'}
@@ -347,24 +344,39 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
                 alt="Zivre Logo" 
                 style={{ height: '40px', width: 'auto', objectFit: 'contain' }}
               />
-              <Typography variant="h6" sx={{ fontFamily: '"Sora", "Inter", sans-serif', fontWeight: 800, letterSpacing: '0.04em', color: '#0a1f1a' }}>
-                ZIVRE <span style={{ fontWeight: 500, color: '#5b6b66', letterSpacing: '0.01em' }}>Facility Services</span>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  fontFamily: '"Sora", "Inter", sans-serif', 
+                  fontWeight: 800, 
+                  letterSpacing: '0.04em', 
+                  color: '#0a1f1a',
+                  fontSize: isMobile ? '1rem' : '1.25rem',
+                }}
+              >
+                ZIVRE
+                {!isMobile && (
+                  <span style={{ fontWeight: 500, color: '#5b6b66', letterSpacing: '0.01em' }}>
+                    {" "}Facility Services
+                  </span>
+                )}
               </Typography>
             </Box>
           </Box>
 
+          {/* ===== RIGHT SIDE: Icons ===== */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {/* NOTIFICATION BELL - ALWAYS VISIBLE (Mobile + Desktop) */}
+            {/* Notification Bell */}
             {user && <NotificationDropdown />}
             
-            {/* Message icon - all logged-in users */}
+            {/* Messages */}
             {user && (
               <IconButton onClick={() => window.location.href = '/messages'}>
                 <MessageIcon />
               </IconButton>
             )}
             
-            {/* Cart icon - customer only with badge */}
+            {/* Cart (customer only) */}
             {user && user.role === 'customer' && (
               <Badge badgeContent={activeRequestCount} color="error" invisible={activeRequestCount === 0}>
                 <IconButton onClick={() => window.dispatchEvent(new CustomEvent('open_cart_drawer'))}>
@@ -372,8 +384,17 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
                 </IconButton>
               </Badge>
             )}
+
+            {/* ===== NEW: Referral Icon (logged-in users) ===== */}
+            {user && (
+              <Tooltip title="Referrals">
+                <IconButton onClick={handleReferralsClick}>
+                  <ShareIcon />
+                </IconButton>
+              </Tooltip>
+            )}
             
-            {/* DESKTOP ONLY - Full navigation and user menu */}
+            {/* ===== DESKTOP ONLY ===== */}
             {!isMobile && (
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 {!hideNavLinks && navItems.map((item) => (
@@ -393,7 +414,6 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
                     >
                       {getReferralsButtonText()}
                     </Button>
-                    {/* NotificationDropdown REMOVED from here - now outside */}
                     <Tooltip title="Account">
                       <Avatar 
                         sx={{ bgcolor: '#10b981', cursor: 'pointer', width: 40, height: 40 }} 
@@ -472,7 +492,7 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
               </Box>
             )}
             
-            {/* MOBILE ONLY - Hamburger menu button */}
+            {/* ===== MOBILE ONLY: Hamburger (only ONE, on the right) ===== */}
             {isMobile && (
               <IconButton onClick={handleDrawerToggle} sx={{ color: '#10b981' }}>
                 <MenuIcon />
