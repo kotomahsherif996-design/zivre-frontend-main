@@ -8,7 +8,7 @@ import ShareIcon from '@mui/icons-material/Share'
 import {
   AppBar, Toolbar, Box, Button, Avatar, Menu, MenuItem, Divider,
   Typography, IconButton, Tooltip, useMediaQuery, Drawer, List,
-  ListItem, ListItemIcon, ListItemText, Badge
+  ListItem, ListItemIcon, ListItemText, Badge, useTheme
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import DashboardIcon from '@mui/icons-material/Dashboard'
@@ -23,13 +23,14 @@ import { getUserRequests } from '../api/client'
 
 const Header = ({ onGetQuote, hideNavLinks = false }) => {
   const { user, logout } = useAuth()
+  const theme = useTheme()
   const [showRoleModal, setShowRoleModal] = useState(false)
   const [showSignUpModal, setShowSignUpModal] = useState(false)
   const [showSignInModal, setShowSignInModal] = useState(false)
   const [selectedRole, setSelectedRole] = useState(null)
   const [anchorEl, setAnchorEl] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const isMobile = useMediaQuery('(max-width:768px)')
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
 
   // === CART BADGE STATE ===
   const [activeRequestCount, setActiveRequestCount] = useState(0)
@@ -47,7 +48,6 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
     return '/referrals'
   }
 
-  // Helper function to get correct button text based on role
   const getReferralsButtonText = () => {
     if (!user) return 'Referrals'
     if (user.role === 'admin') return 'Referral Admin'
@@ -91,10 +91,8 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
     blurActiveElement()
     setSelectedRole(role)
     setShowRoleModal(false)
-    
     // Check for referral code in sessionStorage
-    const referralCode = sessionStorage.getItem('zivre_referral_code');
-    
+    const referralCode = sessionStorage.getItem('zivre_referral_code')
     setShowSignUpModal(true)
   }
 
@@ -145,8 +143,7 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
     if (!user || user.role !== 'customer') return
     try {
       const res = await getUserRequests(user.id)
-      const active = res.data.filter(r => !['confirmed', 'cancelled_by_customer', 'rejected_by_admin', 'declined_by_provider'].includes(r.status)
-      )
+      const active = res.data.filter(r => !['confirmed', 'cancelled_by_customer', 'rejected_by_admin', 'declined_by_provider'].includes(r.status))
       setActiveRequestCount(active.length)
     } catch (err) {
       console.error('Error fetching active requests count:', err)
@@ -189,9 +186,7 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
         handleBookService()
       }, 50)
     }
-    
     window.addEventListener('open_get_started_modal', handleOpenGetStarted)
-    
     return () => {
       window.removeEventListener('open_get_started_modal', handleOpenGetStarted)
     }
@@ -204,15 +199,13 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
         handleSignIn()
       }, 50)
     }
-    
     window.addEventListener('open_signin_modal', handleOpenSignIn)
-    
     return () => {
       window.removeEventListener('open_signin_modal', handleOpenSignIn)
     }
   }, [])
 
-  // ===== DRAWER CONTENT (with fixed width and brand) =====
+  // ===== DRAWER CONTENT (width fixed, brand visible) =====
   const drawer = (
     <Box sx={{ width: { xs: 280, sm: 300 }, p: 2.5 }} role="presentation">
       <Typography 
@@ -340,12 +333,23 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
 
   return (
     <>
-      <AppBar position="sticky" color="default" elevation={0} sx={{ bgcolor: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #e9efec', boxShadow: '0 1px 0 rgba(10,31,26,0.02)' }}>
+      <AppBar 
+        position="sticky" 
+        color="default" 
+        elevation={0} 
+        sx={{ 
+          bgcolor: 'rgba(255,255,255,0.82)', 
+          backdropFilter: 'blur(12px)', 
+          borderBottom: '1px solid #e9efec', 
+          boxShadow: '0 1px 0 rgba(10,31,26,0.02)',
+          zIndex: theme.zIndex.drawer + 1, // ensures header stays above drawer
+        }}
+      >
         <Toolbar sx={{ justifyContent: 'space-between', maxWidth: 1400, width: '100%', mx: 'auto', px: { xs: 2, md: 4 } }}>
           
           {/* ===== LEFT SIDE: Logo & Brand ===== */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {/* LEFT HAMBURGER REMOVED */}
+            {/* LEFT HAMBURGER REMOVED – only one on the right */}
             <Box 
               sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }} 
               onClick={() => window.location.href = '/'}
@@ -375,7 +379,7 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
             </Box>
           </Box>
 
-          {/* ===== RIGHT SIDE: Icons ===== */}
+          {/* ===== RIGHT SIDE: Icons and nav ===== */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {/* Notification Bell */}
             {user && <NotificationDropdown />}
@@ -512,16 +516,26 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
           </Box>
         </Toolbar>
       </AppBar>
-      
+
+      {/* ===== DRAWER (slides in BELOW the header) ===== */}
       <Drawer
         anchor="left"
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{ keepMounted: true }}
+        sx={{
+          '& .MuiDrawer-paper': {
+            top: '64px', // AppBar height
+            height: 'calc(100% - 64px)',
+            boxShadow: '4px 0 20px -8px rgba(0,0,0,0.1)',
+            borderRight: '1px solid #e2e8f0',
+          },
+        }}
       >
         {drawer}
       </Drawer>
 
+      {/* ===== MODALS (unchanged) ===== */}
       {showRoleModal && <RoleModal onSelect={handleRoleSelect} onClose={() => {
         blurActiveElement()
         setShowRoleModal(false)
