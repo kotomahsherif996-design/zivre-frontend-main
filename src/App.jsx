@@ -17,6 +17,9 @@ import About from './components/home/About'
 import ContactForm from './components/home/ContactForm'
 import TestimonialsCarousel from './components/home/TestimonialsCarousel'
 import CommentSection from './components/home/CommentSection'
+import HowItWorks from './components/home/HowItWorks'
+import FAQ from './components/home/FAQ'
+import ClosingCTA from './components/home/ClosingCTA'
 import PaymentFlier from './common/PaymentFlier'
 import CustomerDashboard from './dashboard/CustomerDashboard'
 import ProviderDashboard from './dashboard/ProviderDashboard'
@@ -301,11 +304,14 @@ const AppRoutes = () => {
             <main>
               <Hero onGetQuote={scrollToContact} />
               <ServicesGrid />
+              <HowItWorks />
               <WhyChoose />
               <About />
               <TestimonialsCarousel />
+              <FAQ />
               <ContactForm />
               <CommentSection />
+              <ClosingCTA />
             </main>
             <Footer />
             
