@@ -1,46 +1,115 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   Dialog, DialogContent, DialogActions,
-  Button, Box, Typography, Step, StepLabel, Stepper,
-  IconButton
+  Button, Box, Typography, Step, StepButton, Stepper,
+  IconButton, LinearProgress, Fade, Tooltip
 } from '@mui/material'
 import {
   Close as CloseIcon,
   NavigateNext as NextIcon,
   NavigateBefore as PrevIcon,
-  School as SchoolIcon
+  School as SchoolIcon,
+  CheckCircle as CheckCircleIcon,
+  KeyboardArrowLeft,
+  KeyboardArrowRight
 } from '@mui/icons-material'
 
-const DemoTour = ({ open, onClose, onComplete, steps, title = "Guided Tour" }) => {
-  const [activeStep, setActiveStep] = useState(0)
+// ============================================
+// PER-USER TOUR PROGRESS (shared by DemoTour, TourButton, RoleBasedTour)
+// Keyed by a "scopeId" (typically the user's id + role) so completion and
+// resume progress never leak between different accounts on the same browser.
+// ============================================
+const storageKey = (scopeId) => `zivre_tour_progress_${scopeId}`
+
+export const getTourProgress = (scopeId) => {
+  if (!scopeId) return { step: 0, completed: false }
+  try {
+    const raw = localStorage.getItem(storageKey(scopeId))
+    return raw ? JSON.parse(raw) : { step: 0, completed: false }
+  } catch (e) {
+    return { step: 0, completed: false }
+  }
+}
+
+export const saveTourStep = (scopeId, step) => {
+  if (!scopeId) return
+  try {
+    const current = getTourProgress(scopeId)
+    localStorage.setItem(storageKey(scopeId), JSON.stringify({ ...current, step }))
+  } catch (e) { /* ignore quota/availability errors */ }
+}
+
+export const markTourCompleted = (scopeId) => {
+  if (!scopeId) return
+  try {
+    localStorage.setItem(storageKey(scopeId), JSON.stringify({ step: 0, completed: true }))
+  } catch (e) { /* ignore */ }
+}
+
+const firstName = (fullName) => (fullName || '').trim().split(' ')[0] || ''
+
+const DemoTour = ({ open, onClose, onComplete, steps, title = "Guided Tour", initialStep = 0, onStepChange, userName }) => {
+  const [activeStep, setActiveStep] = useState(initialStep)
+  const [maxVisited, setMaxVisited] = useState(initialStep)
+  const [justFinished, setJustFinished] = useState(false)
   const isLastStep = activeStep === steps.length - 1
+  const progressPct = steps.length > 1 ? Math.round((activeStep / (steps.length - 1)) * 100) : 100
 
-  const handleNext = () => {
-    if (isLastStep) {
-      if (onComplete) onComplete()
-      onClose()
-      setActiveStep(0)
-    } else {
-      setActiveStep(activeStep + 1)
+  // Reset to the saved/initial step every time the dialog opens
+  useEffect(() => {
+    if (open) {
+      setActiveStep(initialStep)
+      setMaxVisited(initialStep)
+      setJustFinished(false)
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
-  const handleBack = () => {
-    setActiveStep(activeStep - 1)
-  }
+  const goToStep = useCallback((next) => {
+    const clamped = Math.max(0, Math.min(steps.length - 1, next))
+    setActiveStep(clamped)
+    setMaxVisited(m => Math.max(m, clamped))
+    if (onStepChange) onStepChange(clamped)
+  }, [steps.length, onStepChange])
 
-  const handleSkip = () => {
-    setActiveStep(0)
+  const handleNext = useCallback(() => {
+    if (isLastStep) {
+      setJustFinished(true)
+      setTimeout(() => {
+        if (onComplete) onComplete()
+        setJustFinished(false)
+      }, 900)
+    } else {
+      goToStep(activeStep + 1)
+    }
+  }, [isLastStep, activeStep, goToStep, onComplete])
+
+  const handleBack = useCallback(() => goToStep(activeStep - 1), [activeStep, goToStep])
+
+  const handleSkip = useCallback(() => {
     onClose()
-  }
+  }, [onClose])
+
+  // Keyboard navigation: ← → to move between visited/next steps, Esc to skip
+  useEffect(() => {
+    if (!open) return
+    const handleKey = (e) => {
+      if (e.key === 'Escape') handleSkip()
+      else if (e.key === 'ArrowRight') handleNext()
+      else if (e.key === 'ArrowLeft' && activeStep > 0) handleBack()
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [open, activeStep, handleNext, handleBack, handleSkip])
 
   const currentStep = steps[activeStep]
+  const showGreeting = activeStep === 0 && !!userName
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={handleSkip}
-      maxWidth="sm" 
+      maxWidth="sm"
       fullWidth
       PaperProps={{ sx: { borderRadius: 3, overflow: 'hidden' } }}
     >
@@ -55,51 +124,99 @@ const DemoTour = ({ open, onClose, onComplete, steps, title = "Guided Tour" }) =
         </IconButton>
       </Box>
 
+      <LinearProgress
+        variant="determinate"
+        value={progressPct}
+        sx={{
+          height: 4,
+          bgcolor: '#e9efec',
+          '& .MuiLinearProgress-bar': { bgcolor: '#10b981' }
+        }}
+      />
+
       <DialogContent sx={{ p: 3, minHeight: 320 }}>
-        <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4, overflowX: 'auto' }}>
+        <Stepper
+          activeStep={activeStep}
+          alternativeLabel
+          nonLinear
+          sx={{ mb: 1, overflowX: 'auto', '& .MuiStepLabel-label': { fontSize: { xs: '0.65rem', sm: '0.8125rem' } } }}
+        >
           {steps.map((step, index) => (
-            <Step key={index}>
-              <StepLabel>{step.title}</StepLabel>
+            <Step key={index} completed={index < maxVisited || (index === maxVisited && index < activeStep)}>
+              <StepButton
+                onClick={() => { if (index <= maxVisited) goToStep(index) }}
+                disabled={index > maxVisited}
+                sx={{ '& .MuiStepLabel-label': { cursor: index <= maxVisited ? 'pointer' : 'default' } }}
+              >
+                {step.title}
+              </StepButton>
             </Step>
           ))}
         </Stepper>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center', mb: 2 }}>
+          Step {activeStep + 1} of {steps.length}
+        </Typography>
 
-        <Box sx={{ textAlign: 'center' }}>
-          <Box sx={{
-            width: 84, height: 84, borderRadius: '50%', mx: 'auto', mb: 2.5,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40,
-            background: 'linear-gradient(135deg, rgba(16,185,129,0.14), rgba(52,211,153,0.18))',
-            border: '1px solid rgba(16,185,129,0.25)'
-          }}>{currentStep?.icon || ''}</Box>
-          <Typography variant="h6" sx={{ fontFamily: '"Sora","Inter",sans-serif', fontWeight: 700, mb: 1, color: '#0a1f1a' }}>
-            {currentStep?.title}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2, whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
-            {currentStep?.description}
-          </Typography>
-          {currentStep?.tip && (
-            <Box sx={{ mt: 2, p: 2, bgcolor: '#f0fdf4', borderRadius: 3, border: '1px solid #d1fae5', textAlign: 'left' }}>
-              <Typography variant="caption" sx={{ color: '#0f3b2c', fontWeight: 600 }}>
-                Tip — {currentStep.tip}
+        <Fade in={!justFinished} timeout={250} unmountOnExit>
+          <Box sx={{ textAlign: 'center' }}>
+            {showGreeting && (
+              <Typography variant="subtitle2" sx={{ color: '#10b981', fontWeight: 700, mb: 0.5 }}>
+                Hi {firstName(userName)} 👋
               </Typography>
-            </Box>
-          )}
-        </Box>
+            )}
+            <Box sx={{
+              width: 84, height: 84, borderRadius: '50%', mx: 'auto', mb: 2.5,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40,
+              background: 'linear-gradient(135deg, rgba(16,185,129,0.14), rgba(52,211,153,0.18))',
+              border: '1px solid rgba(16,185,129,0.25)'
+            }}>{currentStep?.icon || ''}</Box>
+            <Typography variant="h6" sx={{ fontFamily: '"Sora","Inter",sans-serif', fontWeight: 700, mb: 1, color: '#0a1f1a' }}>
+              {currentStep?.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+              {currentStep?.description}
+            </Typography>
+            {currentStep?.tip && (
+              <Box sx={{ mt: 2, p: 2, bgcolor: '#f0fdf4', borderRadius: 3, border: '1px solid #d1fae5', textAlign: 'left' }}>
+                <Typography variant="caption" sx={{ color: '#0f3b2c', fontWeight: 600 }}>
+                  Tip — {currentStep.tip}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </Fade>
+
+        <Fade in={justFinished} timeout={250} unmountOnExit>
+          <Box sx={{ textAlign: 'center', py: 3 }}>
+            <CheckCircleIcon sx={{ fontSize: 64, color: '#10b981', mb: 1 }} />
+            <Typography variant="h6" fontWeight="700" sx={{ color: '#0a1f1a' }}>
+              You're all set{userName ? `, ${firstName(userName)}` : ''}! 🎉
+            </Typography>
+          </Box>
+        </Fade>
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, borderTop: '1px solid #e9efec' }}>
+      <DialogActions sx={{ p: 2, borderTop: '1px solid #e9efec', flexWrap: 'wrap', gap: 1 }}>
         <Button onClick={handleSkip} sx={{ color: '#5b6b66' }}>
           Skip tour
         </Button>
         <Box sx={{ flex: 1 }} />
-        <Button 
+        <Tooltip title="Previous (←)">
+          <span>
+            <IconButton onClick={handleBack} disabled={activeStep === 0} size="small">
+              <KeyboardArrowLeft />
+            </IconButton>
+          </span>
+        </Tooltip>
+        <Button
           onClick={handleBack}
           disabled={activeStep === 0}
           startIcon={<PrevIcon />}
+          sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
         >
           Back
         </Button>
-        <Button 
+        <Button
           onClick={handleNext}
           variant="contained"
           endIcon={isLastStep ? null : <NextIcon />}
@@ -107,6 +224,13 @@ const DemoTour = ({ open, onClose, onComplete, steps, title = "Guided Tour" }) =
         >
           {isLastStep ? 'Finish' : 'Next'}
         </Button>
+        <Tooltip title="Next (→)">
+          <span>
+            <IconButton onClick={handleNext} size="small" sx={{ display: { xs: 'inline-flex', sm: 'none' } }}>
+              <KeyboardArrowRight />
+            </IconButton>
+          </span>
+        </Tooltip>
       </DialogActions>
     </Dialog>
   )
@@ -468,20 +592,34 @@ export const adminTourSteps = [
 
 // ============================================
 // TOUR BUTTON COMPONENT (adjusted for bottom nav)
+// Per-user aware: resumes from the last step the user reached, and — when
+// used by a logged-in user — greets them by name on the first step.
 // ============================================
-export const TourButton = ({ tourSteps, title = "Guided Tour" }) => {
+export const TourButton = ({ tourSteps, title = "Guided Tour", scopeId, userName }) => {
   const [tourOpen, setTourOpen] = useState(false)
+  const [resumeStep, setResumeStep] = useState(0)
 
   const handleStartTour = () => {
+    if (scopeId) {
+      const progress = getTourProgress(scopeId)
+      // If they already finished it, a manual "Start Tour" click replays from the top;
+      // otherwise resume exactly where they left off.
+      setResumeStep(progress.completed ? 0 : (progress.step || 0))
+    } else {
+      setResumeStep(0)
+    }
     setTourOpen(true)
   }
 
-  const handleCloseTour = () => {
+  const handleCloseTour = () => setTourOpen(false)
+
+  const handleCompleteTour = () => {
+    if (scopeId) markTourCompleted(scopeId)
     setTourOpen(false)
   }
 
-  const handleCompleteTour = () => {
-    setTourOpen(false)
+  const handleStepChange = (step) => {
+    if (scopeId) saveTourStep(scopeId, step)
   }
 
   return (
@@ -514,8 +652,11 @@ export const TourButton = ({ tourSteps, title = "Guided Tour" }) => {
         open={tourOpen} 
         onClose={handleCloseTour}
         onComplete={handleCompleteTour}
+        onStepChange={handleStepChange}
+        initialStep={resumeStep}
         steps={tourSteps}
         title={title}
+        userName={userName}
       />
     </>
   )
