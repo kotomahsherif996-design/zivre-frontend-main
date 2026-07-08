@@ -2433,7 +2433,7 @@ const handleDeleteRequestPermanently = async (requestId) => {
       />
       
       <RoleBasedTour />
-      <TourButton tourSteps={adminTourSteps} title="Admin Dashboard Tour" />
+      <TourButton tourSteps={adminTourSteps} title="Admin Dashboard Tour" scopeId={user ? `${user.id}_${user.role}` : null} userName={user?.full_name} />
     </>
   )
 }
