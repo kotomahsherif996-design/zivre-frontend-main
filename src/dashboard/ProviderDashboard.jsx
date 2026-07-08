@@ -974,7 +974,7 @@ const ProviderDashboard = () => {
         </Box>
       </Box>
       <RoleBasedTour />
-      <TourButton tourSteps={providerTourSteps} title="Provider Dashboard Tour" />
+      <TourButton tourSteps={providerTourSteps} title="Provider Dashboard Tour" scopeId={user ? `${user.id}_${user.role}` : null} userName={user?.full_name} />
     </>
   )
 }
