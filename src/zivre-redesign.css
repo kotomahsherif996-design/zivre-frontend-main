@@ -351,3 +351,104 @@
 .code-box code { font-family: monospace; color: var(--zv-green-deep); font-weight: 700; flex: 1; }
 .code-box button { background: var(--zv-green); color: #fff; border: none; border-radius: 8px; padding: .4rem .9rem; cursor: pointer; font-weight: 600; font-size: .82rem; }
 @media (max-width: 600px) { .profile-grid { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   SCROLL-REVEAL SYSTEM
+   Add class="zv-reveal" (+ optional zv-reveal--1..4 for stagger)
+   to any element; a tiny observer in Reveal.jsx adds "is-visible".
+   ============================================================ */
+.zv-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1);
+  will-change: opacity, transform;
+}
+.zv-reveal.is-visible { opacity: 1; transform: translateY(0); }
+.zv-reveal--1.is-visible { transition-delay: .08s; }
+.zv-reveal--2.is-visible { transition-delay: .16s; }
+.zv-reveal--3.is-visible { transition-delay: .24s; }
+.zv-reveal--4.is-visible { transition-delay: .32s; }
+.zv-reveal--scale { transform: scale(.94) translateY(18px); }
+.zv-reveal--scale.is-visible { transform: scale(1) translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .zv-reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* Animated counter ticks — just a gentle settle, the numbers themselves are JS-driven */
+.zv-counter { font-variant-numeric: tabular-nums; }
+
+/* ============================================================
+   HOW IT WORKS
+   ============================================================ */
+.zv-process { background: var(--zv-mist); }
+.zv-process__grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.75rem; margin-top: 3rem; position: relative;
+}
+.zv-process__grid::before {
+  content: ''; position: absolute; top: 34px; left: 12.5%; right: 12.5%; height: 2px;
+  background: repeating-linear-gradient(90deg, var(--zv-line) 0 10px, transparent 10px 20px);
+}
+.zv-process__step { position: relative; text-align: center; }
+.zv-process__num {
+  width: 68px; height: 68px; margin: 0 auto 1.25rem; border-radius: 50%;
+  background: linear-gradient(135deg, var(--zv-green), var(--zv-green-deep)); color: #fff;
+  display: flex; align-items: center; justify-content: center; position: relative; z-index: 1;
+  font-family: var(--zv-display); font-weight: 800; font-size: 1.3rem;
+  box-shadow: 0 14px 30px -12px rgba(16,185,129,.65);
+}
+.zv-process__step h3 { font-family: var(--zv-display); font-size: 1.05rem; color: var(--zv-ink); margin-bottom: .5rem; }
+.zv-process__step p { color: var(--zv-muted); font-size: .88rem; line-height: 1.6; max-width: 15.5rem; margin: 0 auto; }
+@media (max-width: 900px) {
+  .zv-process__grid { grid-template-columns: 1fr 1fr; gap: 2.25rem 1.5rem; }
+  .zv-process__grid::before { display: none; }
+}
+@media (max-width: 560px) {
+  .zv-process__grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.zv-faq { background: #fff; }
+.zv-faq__list { max-width: 46rem; margin: 2.5rem auto 0; display: grid; gap: .9rem; }
+.zv-faq__item {
+  border: 1px solid var(--zv-line); border-radius: 16px; overflow: hidden;
+  background: #fff; transition: border-color .2s ease, box-shadow .2s ease;
+}
+.zv-faq__item.is-open { border-color: rgba(16,185,129,.4); box-shadow: 0 14px 30px -22px rgba(10,31,26,.4); }
+.zv-faq__question {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 1.15rem 1.4rem; background: none; border: none; cursor: pointer; text-align: left;
+  font-family: var(--zv-display); font-weight: 700; font-size: .98rem; color: var(--zv-ink);
+}
+.zv-faq__icon {
+  flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: rgba(16,185,129,.12); color: var(--zv-green-deep); transition: transform .3s ease, background .3s ease;
+}
+.zv-faq__item.is-open .zv-faq__icon { transform: rotate(45deg); background: var(--zv-green); color: #fff; }
+.zv-faq__answer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+.zv-faq__item.is-open .zv-faq__answer { grid-template-rows: 1fr; }
+.zv-faq__answer-inner { overflow: hidden; }
+.zv-faq__answer p { padding: 0 1.4rem 1.3rem; color: var(--zv-muted); font-size: .92rem; line-height: 1.65; }
+
+/* ============================================================
+   CLOSING CTA BANNER
+   ============================================================ */
+.zv-cta {
+  position: relative; overflow: hidden; text-align: center;
+  background: linear-gradient(150deg, var(--zv-ink) 0%, var(--zv-green-deep) 100%);
+  padding: clamp(3.5rem, 7vw, 5.5rem) 1.5rem;
+}
+.zv-cta__glow {
+  position: absolute; width: 480px; height: 480px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(16,185,129,.35), transparent 65%);
+  top: -180px; left: 50%; transform: translateX(-50%); pointer-events: none;
+}
+.zv-cta__content { position: relative; z-index: 1; max-width: 40rem; margin: 0 auto; }
+.zv-cta h2 { font-family: var(--zv-display); font-weight: 800; font-size: clamp(1.6rem, 4vw, 2.4rem); color: #fff; margin-bottom: .9rem; letter-spacing: -.02em; }
+.zv-cta p { color: rgba(255,255,255,.72); font-size: 1.02rem; line-height: 1.6; margin-bottom: 2rem; }
+.zv-cta__actions { display: flex; flex-wrap: wrap; gap: .9rem; justify-content: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .zv-process__num, .zv-faq__icon { transition: none; }
+}
