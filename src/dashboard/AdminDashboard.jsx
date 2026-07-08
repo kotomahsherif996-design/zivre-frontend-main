@@ -22,7 +22,7 @@ import {
   TableRow, Paper, Chip, TextField, Select, MenuItem, Dialog, DialogTitle,
   DialogContent, DialogActions, Alert, Snackbar, CircularProgress, Avatar,
   Tooltip, Switch, TablePagination, Divider, FormControl, InputLabel, Badge,
-  Rating, LinearProgress, Tab, Tabs
+  Rating, LinearProgress, Tab, Tabs, ToggleButton, ToggleButtonGroup
 } from '@mui/material'
 import {
   Menu as MenuIcon, Dashboard as DashboardIcon, Build as BuildIcon,
@@ -70,6 +70,7 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({})
   const [services, setServices] = useState([])
   const [schedules, setSchedules] = useState([])
+  const [scheduleStatusFilter, setScheduleStatusFilter] = useState('active')
   const [quotes, setQuotes] = useState([])
   const [requests, setRequests] = useState([])
   const [users, setUsers] = useState([])
@@ -2076,13 +2077,42 @@ const handleDeleteRequestPermanently = async (requestId) => {
           {activeTab === 12 && (
             <Card sx={{ p: { xs: 2, md: 3 } }}>
               <Typography variant="h6" fontWeight="700" sx={{ mb: 0.5 }}>Scheduled Services</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 Recurring services across all customers. Spawned requests appear in Assign Providers automatically.
               </Typography>
-              {schedules.length === 0 ? (
+              <ToggleButtonGroup
+                exclusive
+                size="small"
+                value={scheduleStatusFilter}
+                onChange={(e, next) => { if (next) setScheduleStatusFilter(next) }}
+                sx={{
+                  mb: 3,
+                  flexWrap: 'wrap',
+                  '& .MuiToggleButton-root': {
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    fontSize: '0.8125rem',
+                    borderColor: '#e2e8f0',
+                    '&.Mui-selected': { bgcolor: '#10b981', color: 'white', '&:hover': { bgcolor: '#059669' } }
+                  }
+                }}
+              >
+                <ToggleButton value="active">Active</ToggleButton>
+                <ToggleButton value="paused">Paused</ToggleButton>
+                <ToggleButton value="cancelled">Cancelled</ToggleButton>
+                <ToggleButton value="completed">Completed</ToggleButton>
+                <ToggleButton value="all">All</ToggleButton>
+              </ToggleButtonGroup>
+              {(() => {
+                const filteredSchedules = scheduleStatusFilter === 'all'
+                  ? schedules
+                  : schedules.filter(s => s.status === scheduleStatusFilter)
+                return filteredSchedules.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 6 }}>
                   <EventIcon sx={{ fontSize: 48, color: '#cbd5e1', mb: 1 }} />
-                  <Typography variant="body2" color="text.secondary">No scheduled services yet.</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {schedules.length === 0 ? 'No scheduled services yet.' : `No ${scheduleStatusFilter} schedules.`}
+                  </Typography>
                 </Box>
               ) : (
                 <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2, overflowX: 'auto' }}>
@@ -2099,7 +2129,7 @@ const handleDeleteRequestPermanently = async (requestId) => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {schedules.map((s) => {
+                      {filteredSchedules.map((s) => {
                         const periodDays = s.period_days || 1
                         const freq = s.schedule_type === 'daily' ? 'Every day'
                           : s.schedule_type === 'weekly' ? `Weekly (day ${s.weekly_day})`
@@ -2107,6 +2137,8 @@ const handleDeleteRequestPermanently = async (requestId) => {
                           : periodDays > 1 ? `Custom range (${periodDays} days)`
                           : 'One-time'
                         const sc = { active: '#10b981', paused: '#f59e0b', completed: '#64748b', cancelled: '#ef4444' }[s.status] || '#64748b'
+                        const nextRunDate = s.next_run ? new Date(s.next_run) : null
+                        const isOverdue = nextRunDate && s.status === 'active' && nextRunDate <= new Date()
                         return (
                           <TableRow key={s.id} hover>
                             <TableCell>{s.customer_name}<br /><Typography variant="caption" color="text.secondary">{s.customer_phone}</Typography></TableCell>
@@ -2126,7 +2158,14 @@ const handleDeleteRequestPermanently = async (requestId) => {
                                 </>
                               ) : '—'}
                             </TableCell>
-                            <TableCell>{s.next_run ? new Date(s.next_run).toLocaleDateString() : '—'}</TableCell>
+                            <TableCell>
+                              {nextRunDate ? nextRunDate.toLocaleString() : '—'}
+                              {isOverdue && (
+                                <Typography variant="caption" sx={{ display: 'block', color: '#ef4444', fontWeight: 600 }}>
+                                  Due — should spawn within 60s
+                                </Typography>
+                              )}
+                            </TableCell>
                             <TableCell>{s.runs_count}</TableCell>
                             <TableCell><Chip label={s.status} size="small" sx={{ bgcolor: sc + '22', color: sc, fontWeight: 600, textTransform: 'capitalize' }} /></TableCell>
                           </TableRow>
@@ -2135,7 +2174,8 @@ const handleDeleteRequestPermanently = async (requestId) => {
                     </TableBody>
                   </Table>
                 </TableContainer>
-              )}
+              )
+              })()}
             </Card>
           )}
 
