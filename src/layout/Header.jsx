@@ -335,13 +335,11 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
     <>
       <AppBar 
         position="sticky" 
-        color="default" 
         elevation={0} 
         sx={{ 
-          bgcolor: 'rgba(255,255,255,0.82)', 
-          backdropFilter: 'blur(12px)', 
-          borderBottom: '1px solid #e9efec', 
-          boxShadow: '0 1px 0 rgba(10,31,26,0.02)',
+          background: 'linear-gradient(120deg, #0a1f1a 0%, #0f3b2c 100%)',
+          borderBottom: '2px solid #10b981',
+          boxShadow: '0 2px 12px -4px rgba(10,31,26,0.35)',
           zIndex: theme.zIndex.drawer + 1, // ensures header stays above drawer
         }}
       >
@@ -365,13 +363,13 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
                   fontFamily: '"Sora", "Inter", sans-serif', 
                   fontWeight: 800, 
                   letterSpacing: '0.04em', 
-                  color: '#0a1f1a',
+                  color: '#ffffff',
                   fontSize: isMobile ? '1rem' : '1.25rem',
                 }}
               >
                 ZIVRE
                 {!isMobile && (
-                  <span style={{ fontWeight: 500, color: '#5b6b66', letterSpacing: '0.01em' }}>
+                  <span style={{ fontWeight: 500, color: 'rgba(255,255,255,0.65)', letterSpacing: '0.01em' }}>
                     {" "}Facility Services
                   </span>
                 )}
@@ -386,7 +384,7 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
             
             {/* Messages */}
             {user && (
-              <IconButton onClick={() => window.location.href = '/messages'}>
+              <IconButton onClick={() => window.location.href = '/messages'} sx={{ color: 'white' }}>
                 <MessageIcon />
               </IconButton>
             )}
@@ -394,7 +392,7 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
             {/* Cart (customer only) */}
             {user && user.role === 'customer' && (
               <Badge badgeContent={activeRequestCount} color="error" invisible={activeRequestCount === 0}>
-                <IconButton onClick={() => window.dispatchEvent(new CustomEvent('open_cart_drawer'))}>
+                <IconButton onClick={() => window.dispatchEvent(new CustomEvent('open_cart_drawer'))} sx={{ color: 'white' }}>
                   <ShoppingCartIcon />
                 </IconButton>
               </Badge>
@@ -403,7 +401,7 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
             {/* ===== REFERRAL ICON (logged-in users) ===== */}
             {user && (
               <Tooltip title="Referrals">
-                <IconButton onClick={handleReferralsClick}>
+                <IconButton onClick={handleReferralsClick} sx={{ color: 'white' }}>
                   <ShareIcon />
                 </IconButton>
               </Tooltip>
@@ -413,10 +411,10 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
             {!isMobile && (
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 {!hideNavLinks && navItems.map((item) => (
-                  <Button key={item.label} color="inherit" onClick={() => {
+                  <Button key={item.label} onClick={() => {
                     blurActiveElement()
                     item.action()
-                  }} sx={{ color: '#3a4a45', fontWeight: 500, borderRadius: 999, px: 1.8, '&:hover': { bgcolor: 'rgba(16,185,129,0.08)', color: '#0f3b2c' } }}>
+                  }} sx={{ color: 'rgba(255,255,255,0.85)', fontWeight: 500, borderRadius: 999, px: 1.8, '&:hover': { bgcolor: 'rgba(255,255,255,0.12)', color: '#ffffff' } }}>
                     {item.label}
                   </Button>
                 ))}
@@ -424,14 +422,14 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Button 
                       onClick={handleReferralsClick}
-                      sx={{ color: '#10b981', fontWeight: 500 }}
+                      sx={{ color: '#6ee7b7', fontWeight: 500, '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' } }}
                       startIcon={<ShareIcon />}
                     >
                       {getReferralsButtonText()}
                     </Button>
                     <Tooltip title="Account">
                       <Avatar 
-                        sx={{ bgcolor: '#10b981', cursor: 'pointer', width: 40, height: 40 }} 
+                        sx={{ bgcolor: '#ffffff', color: '#0f3b2c', cursor: 'pointer', width: 40, height: 40, fontWeight: 700 }} 
                         onClick={handleMenuOpen}
                       >
                         {user.full_name?.charAt(0).toUpperCase()}
@@ -496,10 +494,10 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
                   </Box>
                 ) : (
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button variant="outlined" onClick={handleSignIn} sx={{ borderColor: '#10b981', color: '#10b981' }}>
+                    <Button variant="outlined" onClick={handleSignIn} sx={{ borderColor: 'rgba(255,255,255,0.5)', color: '#ffffff', '&:hover': { borderColor: '#ffffff', bgcolor: 'rgba(255,255,255,0.08)' } }}>
                       Sign In
                     </Button>
-                    <Button variant="contained" onClick={handleBookService} sx={{ bgcolor: '#10b981' }}>
+                    <Button variant="contained" onClick={handleBookService} sx={{ bgcolor: '#ffffff', color: '#0f3b2c', fontWeight: 700, '&:hover': { bgcolor: '#d1fae5' } }}>
                       Get Started
                     </Button>
                   </Box>
@@ -509,7 +507,7 @@ const Header = ({ onGetQuote, hideNavLinks = false }) => {
             
             {/* ===== MOBILE ONLY: Hamburger (only ONE, on the right) ===== */}
             {isMobile && (
-              <IconButton onClick={handleDrawerToggle} sx={{ color: '#10b981' }}>
+              <IconButton onClick={handleDrawerToggle} sx={{ color: 'white' }}>
                 <MenuIcon />
               </IconButton>
             )}
