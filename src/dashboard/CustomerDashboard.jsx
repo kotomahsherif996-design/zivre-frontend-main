@@ -210,7 +210,12 @@ const CustomerDashboard = () => {
       setRequests(requestsRes.data)
       setNotifications(notifRes.data)
       setSchedules(schedulesRes.data || [])
-      const totalSpentForUser = requestsRes.data.reduce((sum, r) => sum + r.amount, 0)
+      // Only count money the customer has actually confirmed and paid — not pending,
+      // in-progress, cancelled/rejected, or "completed" (provider says done, but the
+      // customer hasn't confirmed/paid yet).
+      const totalSpentForUser = requestsRes.data
+        .filter(r => r.status === 'confirmed')
+        .reduce((sum, r) => sum + r.amount, 0)
       setTotalSpent(totalSpentForUser)
     } catch (err) {
       console.error(err)
