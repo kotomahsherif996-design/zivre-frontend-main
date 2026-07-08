@@ -1,4 +1,5 @@
 import React from 'react'
+import Reveal from '../../common/Reveal'
 
 const TestimonialsCarousel = () => {
     const testimonials = [
@@ -18,8 +19,8 @@ const TestimonialsCarousel = () => {
     return (
         <section className="testimonials zv-section">
             <div className="container">
-                <span className="zv-eyebrow zv-center">Client reviews</span>
-                <h2 className="zv-h2 zv-center">Trusted across Ghana</h2>
+                <Reveal as="span" className="zv-eyebrow zv-center" style={{ display: 'block' }}>Client reviews</Reveal>
+                <Reveal delay={1}><h2 className="zv-h2 zv-center">Trusted across Ghana</h2></Reveal>
             </div>
             <div className="zv-marquee">
                 <div className="zv-marquee__track">
