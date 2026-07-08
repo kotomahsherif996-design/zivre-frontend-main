@@ -202,27 +202,57 @@ const ServicesGrid = () => {
                                 )
                             }
                             return (
-                                <img
+                                <div
                                     key={image.src}
-                                    src={image.src}
-                                    alt={image.alt}
                                     style={{
                                         position: 'absolute',
                                         inset: 0,
-                                        width: '100%',
-                                        height: '100%',
-                                        objectFit: 'cover',
                                         opacity: isActive ? 1 : 0,
-                                        transform: isActive && zoomActive ? 'scale(1.09)' : 'scale(1)',
-                                        transition: `opacity 1s ease, transform ${isActive ? '6.5s' : '0s'} ease-out`,
-                                        willChange: 'opacity, transform',
-                                        pointerEvents: 'none'
+                                        transition: 'opacity 1.1s ease',
+                                        overflow: 'hidden'
                                     }}
-                                    onError={() => {
-                                        console.error(`ServicesGrid: image failed to load — check that "${image.src}" exists in /public with this exact case (Vercel is case-sensitive).`)
-                                        setImageErrors(prev => ({ ...prev, [index]: true }))
-                                    }}
-                                />
+                                >
+                                    {/* Blurred, slowly zooming backdrop fills the whole frame with motion */}
+                                    <img
+                                        src={image.src}
+                                        alt=""
+                                        aria-hidden="true"
+                                        style={{
+                                            position: 'absolute',
+                                            inset: 0,
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
+                                            filter: 'blur(28px) brightness(0.6) saturate(1.15)',
+                                            transform: isActive && zoomActive ? 'scale(1.22)' : 'scale(1.1)',
+                                            transition: `transform ${isActive ? '7s' : '0s'} ease-out`,
+                                            willChange: 'transform',
+                                            pointerEvents: 'none'
+                                        }}
+                                        onError={() => setImageErrors(prev => ({ ...prev, [index]: true }))}
+                                    />
+                                    {/* The full photo, always shown uncropped */}
+                                    <img
+                                        src={image.src}
+                                        alt={image.alt}
+                                        style={{
+                                            position: 'absolute',
+                                            inset: 0,
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'contain',
+                                            filter: 'drop-shadow(0 16px 32px rgba(0,0,0,0.4))',
+                                            transform: isActive && zoomActive ? 'scale(1.015)' : 'scale(1)',
+                                            transition: `transform ${isActive ? '7s' : '0s'} ease-out`,
+                                            willChange: 'transform',
+                                            pointerEvents: 'none'
+                                        }}
+                                        onError={() => {
+                                            console.error(`ServicesGrid: image failed to load — check that "${image.src}" exists in /public with this exact case (Vercel is case-sensitive).`)
+                                            setImageErrors(prev => ({ ...prev, [index]: true }))
+                                        }}
+                                    />
+                                </div>
                             )
                         })}
 
