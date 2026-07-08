@@ -15,7 +15,7 @@ import {
   DialogContent, DialogActions, Alert, Snackbar,
   CircularProgress, Avatar, Tooltip, InputAdornment, Badge,
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-  Divider, LinearProgress
+  Divider, LinearProgress, ToggleButton, ToggleButtonGroup
 } from '@mui/material'
 import {
   Menu as MenuIcon, Dashboard as DashboardIcon, ShoppingBag as ServicesIcon,
@@ -91,6 +91,7 @@ const CustomerDashboard = () => {
   const [requestSchedule, setRequestSchedule] = useState(defaultSchedule)
   const [schedules, setSchedules] = useState([])
   const [scheduleActionLoading, setScheduleActionLoading] = useState(null)
+  const [scheduleStatusFilter, setScheduleStatusFilter] = useState('active')
   const [selectedService, setSelectedService] = useState(null)
   const [actionLoading, setActionLoading] = useState(false)
   const [ratingLoading, setRatingLoading] = useState(null)
@@ -846,19 +847,48 @@ const CustomerDashboard = () => {
           {activeTab === 5 && (
             <Box>
               <Typography variant="h6" fontWeight="600" sx={{ mb: 1, color: '#0f172a' }}>Scheduled Services</Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 Recurring requests run automatically. Pause, resume, or stop them anytime.
               </Typography>
-              {schedules.length === 0 ? (
+              <ToggleButtonGroup
+                exclusive
+                size="small"
+                value={scheduleStatusFilter}
+                onChange={(e, next) => { if (next) setScheduleStatusFilter(next) }}
+                sx={{
+                  mb: 3,
+                  flexWrap: 'wrap',
+                  '& .MuiToggleButton-root': {
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                    borderColor: '#e2e8f0',
+                    '&.Mui-selected': { bgcolor: '#10b981', color: 'white', '&:hover': { bgcolor: '#059669' } }
+                  }
+                }}
+              >
+                <ToggleButton value="active">Active</ToggleButton>
+                <ToggleButton value="paused">Paused</ToggleButton>
+                <ToggleButton value="cancelled">Cancelled</ToggleButton>
+                <ToggleButton value="completed">Completed</ToggleButton>
+                <ToggleButton value="all">All</ToggleButton>
+              </ToggleButtonGroup>
+              {(() => {
+                const filteredSchedules = scheduleStatusFilter === 'all'
+                  ? schedules
+                  : schedules.filter(s => s.status === scheduleStatusFilter)
+                return filteredSchedules.length === 0 ? (
                 <Card sx={{ p: 4, textAlign: 'center' }}>
                   <EventIcon sx={{ fontSize: 48, color: '#cbd5e1', mb: 1 }} />
                   <Typography variant="body2" color="text.secondary">
-                    You have no scheduled services yet. Choose a frequency when requesting a service to set one up.
+                    {schedules.length === 0
+                      ? 'You have no scheduled services yet. Choose a frequency when requesting a service to set one up.'
+                      : `No ${scheduleStatusFilter} schedules.`}
                   </Typography>
                 </Card>
               ) : (
                 <Grid container spacing={2}>
-                  {schedules.map((s) => {
+                  {filteredSchedules.map((s) => {
                     const statusColors = {
                       active: { color: '#10b981', bg: '#d1fae5', label: 'Active' },
                       paused: { color: '#f59e0b', bg: '#fef3c7', label: 'Paused' },
@@ -918,7 +948,8 @@ const CustomerDashboard = () => {
                     )
                   })}
                 </Grid>
-              )}
+              )
+              })()}
             </Box>
           )}
 
