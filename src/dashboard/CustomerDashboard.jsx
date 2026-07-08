@@ -1067,7 +1067,7 @@ const CustomerDashboard = () => {
         </Box>
       </Box>
       <RoleBasedTour />
-      <TourButton tourSteps={customerTourSteps} title="Customer Dashboard Tour" />
+      <TourButton tourSteps={customerTourSteps} title="Customer Dashboard Tour" scopeId={user ? `${user.id}_${user.role}` : null} userName={user?.full_name} />
       <CustomServiceModal open={customModalOpen} onClose={() => setCustomModalOpen(false)} onSubmitSuccess={() => { loadData(); setCustomModalOpen(false); }} />
     </>
   )
