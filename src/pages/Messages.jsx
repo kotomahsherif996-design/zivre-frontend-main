@@ -642,7 +642,7 @@ const Messages = () => {
     <>
       <Header onGetQuote={scrollToContact} hideNavLinks={true} />
       
-      <Box sx={{ height: 'calc(100vh - 64px)', bgcolor: '#f0f2f5', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ height: 'calc(100vh - 64px)', bgcolor: '#f4f8f6', display: 'flex', flexDirection: 'column' }}>
         {toast && (
           <Alert severity={toast.type} sx={{ position: 'fixed', top: 70, right: 20, zIndex: 1000, borderRadius: 2 }} onClose={() => setToast(null)}>
             {toast.message}
@@ -667,9 +667,10 @@ const Messages = () => {
               transition: 'width 0.3s' 
             }}>
               
-              <Box sx={{ p: 2, bgcolor: '#075e54', color: 'white' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="h6" fontWeight="600">Messages</Typography>
+              <Box sx={{ p: 2, background: 'linear-gradient(120deg, #0a1f1a 0%, #0f3b2c 100%)', color: 'white', position: 'relative', overflow: 'hidden' }}>
+                <Box sx={{ position: 'absolute', top: -40, right: -20, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.35), transparent 70%)', pointerEvents: 'none' }} />
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
+                  <Typography variant="h6" fontWeight="700" sx={{ fontFamily: '"Sora","Inter",sans-serif' }}>Messages</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     {!isConnected && (
                       <Tooltip title="Reconnect">
@@ -680,7 +681,7 @@ const Messages = () => {
                     )}
                     {isConnected && (
                       <Tooltip title="Connected">
-                        <WifiIcon sx={{ color: '#25D366', fontSize: 20 }} />
+                        <WifiIcon sx={{ color: '#6ee7b7', fontSize: 20 }} />
                       </Tooltip>
                     )}
                     {totalUnreadCount > 0 && (
@@ -690,12 +691,12 @@ const Messages = () => {
                     )}
                   </Box>
                 </Box>
-                <Typography variant="caption" sx={{ opacity: 0.8, display: 'block', mt: 0.5 }}>
-                  <CircleIcon sx={{ fontSize: 10, color: '#10b981', mr: 0.5, verticalAlign: 'middle' }} />Always Online • {getMessagingRules()}
+                <Typography variant="caption" sx={{ opacity: 0.75, display: 'block', mt: 0.5, position: 'relative' }}>
+                  <CircleIcon sx={{ fontSize: 10, color: '#6ee7b7', mr: 0.5, verticalAlign: 'middle' }} />Always Online • {getMessagingRules()}
                 </Typography>
               </Box>
               
-              <Box sx={{ p: 1.5, bgcolor: '#f0f2f5' }}>
+              <Box sx={{ p: 1.5, bgcolor: '#f8fafc' }}>
                 <TextField
                   fullWidth
                   size="small"
@@ -704,14 +705,24 @@ const Messages = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   slotProps={{
                     input: {
-                      startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#54656f', fontSize: 20 }} /></InputAdornment>
+                      startAdornment: <InputAdornment position="start"><SearchIcon sx={{ color: '#94a3b8', fontSize: 20 }} /></InputAdornment>
                     }
                   }}
                   sx={{ bgcolor: 'white', borderRadius: 2, '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                 />
               </Box>
               
-              <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} sx={{ borderBottom: '1px solid #e2e8f0' }}>
+              <Tabs
+                value={tabValue}
+                onChange={(e, v) => setTabValue(v)}
+                sx={{
+                  borderBottom: '1px solid #e2e8f0',
+                  minHeight: 44,
+                  '& .MuiTab-root': { minHeight: 44, textTransform: 'none', fontWeight: 600, color: '#5b6b66' },
+                  '& .Mui-selected': { color: '#059669 !important' },
+                  '& .MuiTabs-indicator': { bgcolor: '#10b981', height: 3, borderRadius: '3px 3px 0 0' }
+                }}
+              >
                 <Tab icon={<ChatIcon />} label="Chats" iconPosition="start" />
                 <Tab icon={<PeopleIcon />} label="Contacts" iconPosition="start" />
               </Tabs>
@@ -739,9 +750,11 @@ const Messages = () => {
                           alignItems: 'center',
                           p: 1.5,
                           cursor: 'pointer',
-                          bgcolor: selectedUser?.id === conv.id ? '#e8f0fe' : 'transparent',
-                          borderBottom: '1px solid #e2e8f0',
-                          '&:hover': { bgcolor: '#f5f5f5' }
+                          bgcolor: selectedUser?.id === conv.id ? '#f0fdf4' : 'transparent',
+                          borderLeft: selectedUser?.id === conv.id ? '3px solid #10b981' : '3px solid transparent',
+                          borderBottom: '1px solid #f1f5f9',
+                          transition: 'background-color 0.15s ease',
+                          '&:hover': { bgcolor: selectedUser?.id === conv.id ? '#f0fdf4' : '#f8fafc' }
                         }}
                       >
                         <Box sx={{ position: 'relative' }}>
@@ -749,7 +762,7 @@ const Messages = () => {
                             {conv.name?.charAt(0).toUpperCase()}
                           </Avatar>
                           {onlineUsers[conv.id] && (
-                            <Box sx={{ position: 'absolute', bottom: 2, right: 10, width: 10, height: 10, bgcolor: '#25D366', borderRadius: '50%', border: '2px solid white' }} />
+                            <Box sx={{ position: 'absolute', bottom: 2, right: 10, width: 10, height: 10, bgcolor: '#10b981', borderRadius: '50%', border: '2px solid white' }} />
                           )}
                         </Box>
                         <Box sx={{ flex: 1, overflow: 'hidden' }}>
@@ -779,7 +792,7 @@ const Messages = () => {
               
               {tabValue === 1 && (
                 <Box sx={{ flex: 1, overflow: 'auto' }}>
-                  <Box sx={{ p: 1.5, bgcolor: '#f0f2f5', borderBottom: '1px solid #e2e8f0' }}>
+                  <Box sx={{ p: 1.5, bgcolor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                     <Typography variant="caption" color="text.secondary">
                       {contacts.length} contact{contacts.length !== 1 ? 's' : ''} available
                     </Typography>
@@ -814,8 +827,9 @@ const Messages = () => {
                             alignItems: 'center',
                             p: 1.5,
                             cursor: 'pointer',
-                            borderBottom: '1px solid #e2e8f0',
-                            '&:hover': { bgcolor: '#f5f5f5' }
+                            borderBottom: '1px solid #f1f5f9',
+                            transition: 'background-color 0.15s ease',
+                            '&:hover': { bgcolor: '#f8fafc' }
                           }}
                         >
                           <Box sx={{ position: 'relative' }}>
@@ -823,7 +837,7 @@ const Messages = () => {
                               {contact.full_name?.charAt(0).toUpperCase()}
                             </Avatar>
                             {contact.is_online && (
-                              <Box sx={{ position: 'absolute', bottom: 2, right: 10, width: 10, height: 10, bgcolor: '#25D366', borderRadius: '50%', border: '2px solid white' }} />
+                              <Box sx={{ position: 'absolute', bottom: 2, right: 10, width: 10, height: 10, bgcolor: '#10b981', borderRadius: '50%', border: '2px solid white' }} />
                             )}
                           </Box>
                           <Box sx={{ flex: 1 }}>
@@ -842,7 +856,7 @@ const Messages = () => {
                           <Button 
                             size="small" 
                             variant="outlined"
-                            sx={{ borderColor: '#10b981', color: '#10b981', borderRadius: 2 }}
+                            sx={{ borderColor: '#10b981', color: '#059669', borderRadius: 2, textTransform: 'none', fontWeight: 600, '&:hover': { borderColor: '#059669', bgcolor: '#f0fdf4' } }}
                           >
                             Message
                           </Button>
@@ -858,22 +872,26 @@ const Messages = () => {
               flex: 1, 
               display: 'flex', 
               flexDirection: 'column', 
-              bgcolor: '#e5ddd5', 
+              bgcolor: '#f4f8f6', 
               position: 'relative',
-              backgroundImage: 'radial-gradient(circle at 10% 20%, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.02) 100%)'
+              backgroundImage: 'radial-gradient(circle, rgba(16,185,129,0.05) 1px, transparent 1px)',
+              backgroundSize: '20px 20px'
             }}>
               {selectedUser ? (
                 <>
                   <Box sx={{ 
                     p: 1.5, 
-                    bgcolor: '#075e54', 
+                    background: 'linear-gradient(120deg, #0a1f1a 0%, #0f3b2c 100%)', 
                     color: 'white',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 2
+                    gap: 2,
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}>
+                    <Box sx={{ position: 'absolute', top: -40, right: -20, width: 140, height: 140, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.3), transparent 70%)', pointerEvents: 'none' }} />
                     {isMobile && (
-                      <IconButton onClick={() => setSelectedUser(null)} sx={{ color: 'white' }}>
+                      <IconButton onClick={() => setSelectedUser(null)} sx={{ color: 'white', position: 'relative' }}>
                         <ArrowBackIcon />
                       </IconButton>
                     )}
@@ -881,28 +899,28 @@ const Messages = () => {
                       <Avatar sx={{ bgcolor: getRoleColor(selectedUser.role) }}>
                         {selectedUser.name?.charAt(0).toUpperCase()}
                       </Avatar>
-                      <Box sx={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, bgcolor: '#25D366', borderRadius: '50%', border: '2px solid #075e54' }} />
+                      <Box sx={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, bgcolor: '#10b981', borderRadius: '50%', border: '2px solid #0f3b2c' }} />
                     </Box>
-                    <Box sx={{ flex: 1 }}>
+                    <Box sx={{ flex: 1, position: 'relative' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <Typography variant="subtitle1" fontWeight="600">{selectedUser.name}</Typography>
                         {getRoleIcon(selectedUser.role)}
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="caption" sx={{ opacity: 0.8, color: '#25D366' }}>
-                          <CircleIcon sx={{ fontSize: 9, color: '#10b981', mr: 0.5, verticalAlign: 'middle' }} />Online
+                        <Typography variant="caption" sx={{ opacity: 0.85, color: '#6ee7b7' }}>
+                          <CircleIcon sx={{ fontSize: 9, color: '#6ee7b7', mr: 0.5, verticalAlign: 'middle' }} />Online
                         </Typography>
                       </Box>
                     </Box>
                     <Chip 
                       size="small" 
                       label={isConnected ? 'Live' : 'Reconnecting'} 
-                      sx={{ bgcolor: isConnected ? '#25D366' : '#f59e0b', color: 'white' }} 
+                      sx={{ bgcolor: isConnected ? '#10b981' : '#f59e0b', color: 'white', fontWeight: 600, position: 'relative' }} 
                     />
                   </Box>
                   
                   {replyingTo && (
-                    <Box sx={{ p: 1, bgcolor: '#e8f0fe', borderLeft: `4px solid #10b981`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ p: 1, bgcolor: '#f0fdf4', borderLeft: `4px solid #10b981`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Box>
                         <Typography variant="caption" color="text.secondary">Replying to {replyingTo.sender_name}</Typography>
                         <Typography variant="body2" noWrap sx={{ maxWidth: '80%' }}>{replyingTo.message?.substring(0, 50)}</Typography>
@@ -923,7 +941,7 @@ const Messages = () => {
                     {Object.entries(groupedMessages).map(([date, msgs]) => (
                       <Box key={date}>
                         <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
-                          <Typography variant="caption" sx={{ bgcolor: '#e0e0e0', px: 2, py: 0.5, borderRadius: 10 }}>
+                          <Typography variant="caption" sx={{ bgcolor: 'white', color: '#5b6b66', border: '1px solid #e2e8f0', px: 2, py: 0.5, borderRadius: 10, fontWeight: 500 }}>
                             {date === new Date().toLocaleDateString() ? 'Today' : date}
                           </Typography>
                         </Box>
@@ -1050,8 +1068,8 @@ const Messages = () => {
                     ))}
                     {typingUsers && typingUsers[selectedUser.id] && (
                       <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 1 }}>
-                        <Paper sx={{ p: 1, bgcolor: 'white', borderRadius: 2 }}>
-                          <Typography variant="caption" color="text.secondary">
+                        <Paper sx={{ p: 1.25, px: 1.75, bgcolor: 'white', borderRadius: '16px 16px 16px 4px', border: '1px solid #e9efec', boxShadow: '0 2px 8px -4px rgba(10,31,26,0.15)' }}>
+                          <Typography variant="caption" sx={{ color: '#5b6b66', fontStyle: 'italic' }}>
                             {selectedUser.name} is typing...
                           </Typography>
                         </Paper>
@@ -1060,10 +1078,10 @@ const Messages = () => {
                     <div ref={messagesEndRef} />
                   </Box>
                   
-                  <Box sx={{ p: 1.5, bgcolor: '#f0f2f5', display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <Box sx={{ p: 1.5, bgcolor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
                     <IconButton 
                       onClick={(e) => setEmojiPickerAnchor(e.currentTarget)}
-                      sx={{ color: '#54656f' }}
+                      sx={{ color: '#5b6b66' }}
                     >
                       <EmojiIcon />
                     </IconButton>
@@ -1106,7 +1124,7 @@ const Messages = () => {
                     
                     <IconButton 
                       onClick={(e) => setAttachmentMenuAnchor(e.currentTarget)}
-                      sx={{ color: '#54656f' }}
+                      sx={{ color: '#5b6b66' }}
                     >
                       <AttachFileIcon />
                     </IconButton>
@@ -1146,7 +1164,7 @@ const Messages = () => {
                       variant="contained"
                       onClick={handleSendMessage}
                       disabled={sending || (!newMessage.trim() && !replyingTo) || uploadingFile}
-                      sx={{ bgcolor: '#075e54', '&:hover': { bgcolor: '#054740' }, minWidth: 50, borderRadius: 2 }}
+                      sx={{ bgcolor: '#10b981', '&:hover': { bgcolor: '#059669' }, minWidth: 50, borderRadius: 2, boxShadow: 'none' }}
                     >
                       {sending ? <CircularProgress size={20} sx={{ color: 'white' }} /> : <SendIcon />}
                     </Button>
@@ -1158,15 +1176,20 @@ const Messages = () => {
                 </>
               ) : (
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', flexDirection: 'column', gap: 2 }}>
-                  <Avatar sx={{ width: 80, height: 80, bgcolor: '#075e54' }}>
-                    <MessageIcon sx={{ fontSize: 40 }} />
-                  </Avatar>
-                  <Typography variant="h6" color="text.secondary">Select a chat to start messaging</Typography>
-                  <Typography variant="body2" color="text.secondary">Click on a conversation or go to Contacts tab</Typography>
+                  <Box sx={{
+                    width: 88, height: 88, borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'radial-gradient(circle, rgba(16,185,129,0.16), rgba(16,185,129,0.04) 72%)',
+                    border: '1.5px solid rgba(16,185,129,0.3)'
+                  }}>
+                    <MessageIcon sx={{ fontSize: 38, color: '#059669' }} />
+                  </Box>
+                  <Typography variant="h6" sx={{ color: '#0a1f1a', fontWeight: 700, fontFamily: '"Sora","Inter",sans-serif' }}>Select a chat to start messaging</Typography>
+                  <Typography variant="body2" color="text.secondary">Click on a conversation or go to the Contacts tab</Typography>
                   <Button 
                     variant="outlined" 
                     onClick={() => setTabValue(1)}
-                    sx={{ borderColor: '#10b981', color: '#10b981' }}
+                    sx={{ borderColor: '#10b981', color: '#059669', textTransform: 'none', fontWeight: 600, borderRadius: 2, '&:hover': { borderColor: '#059669', bgcolor: '#f0fdf4' } }}
                   >
                     Browse Contacts
                   </Button>
