@@ -1,4 +1,6 @@
 import React from 'react'
+import Reveal from '../../common/Reveal'
+import AnimatedCounter from '../../common/AnimatedCounter'
 
 const WhyChoose = () => {
     const features = [
@@ -12,15 +14,17 @@ const WhyChoose = () => {
         <section className="why-choose zv-section">
             <div className="container zv-why">
                 <div className="zv-why__content">
-                    <span className="zv-eyebrow">Why Zivre</span>
-                    <h2 className="zv-h2">Excellence you can feel in the building</h2>
-                    <p className="zv-lead">
-                        A well-kept space runs quieter, lasts longer, and works harder.
-                        Our commitment to quality is why facilities across Ghana trust us to keep them alive.
-                    </p>
+                    <Reveal as="span" className="zv-eyebrow" style={{ display: 'inline-flex' }}>Why Zivre</Reveal>
+                    <Reveal delay={1}><h2 className="zv-h2">Excellence you can feel in the building</h2></Reveal>
+                    <Reveal delay={2}>
+                        <p className="zv-lead">
+                            A well-kept space runs quieter, lasts longer, and works harder.
+                            Our commitment to quality is why facilities across Ghana trust us to keep them alive.
+                        </p>
+                    </Reveal>
                     <ul className="zv-feature-list">
                         {features.map((item, idx) => (
-                            <li key={idx} className="zv-feature">
+                            <Reveal as="li" key={idx} delay={Math.min(idx + 1, 4)} className="zv-feature">
                                 <span className="zv-feature__mark" aria-hidden="true">
                                     <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
                                 </span>
@@ -28,29 +32,29 @@ const WhyChoose = () => {
                                     <strong>{item.title}</strong>
                                     <p>{item.description}</p>
                                 </div>
-                            </li>
+                            </Reveal>
                         ))}
                     </ul>
                 </div>
-                <aside className="zv-why__stats" aria-label="Track record">
+                <Reveal as="aside" delay={2} scale className="zv-why__stats" aria-label="Track record">
                     <div className="zv-stat-card">
                         <div className="zv-stat">
-                            <span className="zv-stat__num">11+</span>
+                            <span className="zv-stat__num"><AnimatedCounter value={11} suffix="+" /></span>
                             <span className="zv-stat__label">Years of service</span>
                         </div>
                         <div className="zv-stat">
-                            <span className="zv-stat__num">5.0<span className="zv-stat__star">★</span></span>
+                            <span className="zv-stat__num"><AnimatedCounter value={5.0} /><span className="zv-stat__star">★</span></span>
                             <span className="zv-stat__label">Average client rating</span>
                         </div>
                         <div className="zv-stat">
-                            <span className="zv-stat__num">13</span>
+                            <span className="zv-stat__num"><AnimatedCounter value={13} /></span>
                             <span className="zv-stat__label">Service lines covered</span>
                         </div>
                         <svg className="zv-stat-card__pulse" viewBox="0 0 240 30" preserveAspectRatio="none" aria-hidden="true">
                             <path d="M0 15 H80 L92 4 L104 26 L114 15 H240" fill="none" stroke="currentColor" strokeWidth="2"/>
                         </svg>
                     </div>
-                </aside>
+                </Reveal>
             </div>
         </section>
     )
