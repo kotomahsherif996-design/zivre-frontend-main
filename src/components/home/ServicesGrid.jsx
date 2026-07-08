@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { getServices } from "../../api/client";
 import LoadingSpinner from "../../common/LoadingSpinner";
 
@@ -7,6 +7,10 @@ const ServicesGrid = () => {
     const [loading, setLoading] = useState(true)
     const [showServices, setShowServices] = useState(false)
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
+    const [isHoveringCarousel, setIsHoveringCarousel] = useState(false)
+    const [zoomActive, setZoomActive] = useState(false)
+    const [hasEnteredView, setHasEnteredView] = useState(false)
+    const carouselWrapperRef = useRef(null)
 
     // ===== ADD YOUR IMAGES HERE =====
     // Replace these with your actual image names
@@ -15,16 +19,40 @@ const ServicesGrid = () => {
         { src: "/Adi2.jpeg", alt: "Zivre Facility Service 2" },
     ]
 
-    // Auto-slide every 3 seconds
+    // Auto-slide every 4 seconds — paused while the visitor is hovering
     useEffect(() => {
-        if (carouselImages.length <= 1) return
+        if (carouselImages.length <= 1 || isHoveringCarousel) return
         const interval = setInterval(() => {
             setCurrentImageIndex((prevIndex) => 
                 prevIndex === carouselImages.length - 1 ? 0 : prevIndex + 1
             )
-        }, 3000)
+        }, 4000)
         return () => clearInterval(interval)
-    }, [carouselImages.length])
+    }, [carouselImages.length, isHoveringCarousel])
+
+    // Restart the slow "Ken Burns" zoom every time the active slide changes
+    useEffect(() => {
+        setZoomActive(false)
+        const t = setTimeout(() => setZoomActive(true), 60)
+        return () => clearTimeout(t)
+    }, [currentImageIndex])
+
+    // Fade + rise into view the first time the carousel scrolls into the viewport
+    useEffect(() => {
+        const node = carouselWrapperRef.current
+        if (!node) return
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setHasEnteredView(true)
+                    observer.disconnect()
+                }
+            },
+            { threshold: 0.2 }
+        )
+        observer.observe(node)
+        return () => observer.disconnect()
+    }, [])
 
     // Manual navigation functions
     const goToPrevious = () => {
@@ -132,110 +160,129 @@ const ServicesGrid = () => {
                 )}
             </div>
 
-            {/* ===== MOVING IMAGE CAROUSEL ===== */}
-            <div style={{ textAlign: 'center', marginTop: '2rem', marginBottom: '2rem' }}>
-                <div style={{ 
-                    position: 'relative',
-                    maxWidth: '450px',
-                    margin: '0 auto',
-                    display: 'inline-block'
-                }}>
-                    {/* Main Image */}
-                    <img 
-                        src={carouselImages[currentImageIndex].src}
-                        alt={carouselImages[currentImageIndex].alt}
+            {/* ===== SHOWCASE CAROUSEL ===== */}
+            <div style={{ padding: '3rem 1.5rem 3.5rem', background: 'linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)' }}>
+                <div
+                    ref={carouselWrapperRef}
+                    style={{
+                        maxWidth: '640px',
+                        margin: '0 auto',
+                        opacity: hasEnteredView ? 1 : 0,
+                        transform: hasEnteredView ? 'translateY(0)' : 'translateY(28px)',
+                        transition: 'opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1)'
+                    }}
+                >
+                    <div
+                        onMouseEnter={() => setIsHoveringCarousel(true)}
+                        onMouseLeave={() => setIsHoveringCarousel(false)}
                         style={{
-                            maxWidth: '500px',
-                            width: '100%',
-                            height: 'auto',
-                            borderRadius: '16px',
-                            display: 'block',
-                            margin: '0 auto',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            transition: 'opacity 0.3s ease'
+                            position: 'relative',
+                            borderRadius: '22px',
+                            overflow: 'hidden',
+                            aspectRatio: '16 / 10',
+                            background: '#0f3b2c',
+                            boxShadow: '0 24px 48px -16px rgba(15,59,44,0.35), 0 0 0 1px rgba(16,185,129,0.1)'
                         }}
-                        onError={(e) => {
-                            console.log(`Image failed to load: ${carouselImages[currentImageIndex].src}`);
-                            e.target.style.display = 'none';
-                        }}
-                    />
+                    >
+                        {/* Stacked images cross-fade into each other */}
+                        {carouselImages.map((image, index) => {
+                            const isActive = index === currentImageIndex
+                            return (
+                                <img
+                                    key={image.src}
+                                    src={image.src}
+                                    alt={image.alt}
+                                    style={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover',
+                                        opacity: isActive ? 1 : 0,
+                                        transform: isActive && zoomActive ? 'scale(1.09)' : 'scale(1)',
+                                        transition: `opacity 1s ease, transform ${isActive ? '6.5s' : '0s'} ease-out`,
+                                        willChange: 'opacity, transform',
+                                        pointerEvents: 'none'
+                                    }}
+                                    onError={(e) => { e.target.style.display = 'none' }}
+                                />
+                            )
+                        })}
 
-                    {/* Left Arrow - Only show if more than 1 image */}
-                    {carouselImages.length > 1 && (
-                        <button
-                            onClick={goToPrevious}
-                            style={{
-                                position: 'absolute',
-                                left: '-30px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                backgroundColor: '#10b981',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '36px',
-                                height: '36px',
-                                cursor: 'pointer',
-                                fontSize: '18px',
-                                zIndex: 1,
-                                transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
-                        >
-                            ❮
-                        </button>
-                    )}
+                        {/* Soft scrim so controls stay legible over any photo */}
+                        <div style={{
+                            position: 'absolute', inset: 0,
+                            background: 'linear-gradient(180deg, rgba(10,31,26,0.05) 0%, transparent 30%, transparent 60%, rgba(10,31,26,0.5) 100%)',
+                            pointerEvents: 'none'
+                        }} />
 
-                    {/* Right Arrow - Only show if more than 1 image */}
-                    {carouselImages.length > 1 && (
-                        <button
-                            onClick={goToNext}
-                            style={{
-                                position: 'absolute',
-                                right: '-30px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                backgroundColor: '#10b981',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '36px',
-                                height: '36px',
-                                cursor: 'pointer',
-                                fontSize: '18px',
-                                zIndex: 1,
-                                transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#059669'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#10b981'}
-                        >
-                            ❯
-                        </button>
-                    )}
-                </div>
+                        {carouselImages.length > 1 && (
+                            <>
+                                <button
+                                    onClick={goToPrevious}
+                                    aria-label="Previous image"
+                                    style={{
+                                        position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)',
+                                        width: '38px', height: '38px', borderRadius: '50%',
+                                        background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                                        border: '1px solid rgba(255,255,255,0.35)', color: '#ffffff',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        cursor: 'pointer', zIndex: 2, transition: 'background 0.2s ease, transform 0.2s ease'
+                                    }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.38)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)' }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)' }}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M15 18l-6-6 6-6" />
+                                    </svg>
+                                </button>
 
-                {/* Dots Indicator - Shows which image is active */}
-                {carouselImages.length > 1 && (
-                    <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                        {carouselImages.map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => goToSlide(index)}
-                                style={{
-                                    width: '10px',
-                                    height: '10px',
-                                    borderRadius: '50%',
-                                    border: 'none',
-                                    backgroundColor: currentImageIndex === index ? '#10b981' : '#cbd5e1',
-                                    cursor: 'pointer',
-                                    padding: 0,
-                                    transition: 'all 0.2s'
-                                }}
-                            />
-                        ))}
+                                <button
+                                    onClick={goToNext}
+                                    aria-label="Next image"
+                                    style={{
+                                        position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)',
+                                        width: '38px', height: '38px', borderRadius: '50%',
+                                        background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                                        border: '1px solid rgba(255,255,255,0.35)', color: '#ffffff',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        cursor: 'pointer', zIndex: 2, transition: 'background 0.2s ease, transform 0.2s ease'
+                                    }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.38)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)' }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)' }}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M9 18l6-6-6-6" />
+                                    </svg>
+                                </button>
+
+                                {/* Story-bar style progress dots */}
+                                <div style={{
+                                    position: 'absolute', bottom: '16px', left: 0, right: 0,
+                                    display: 'flex', justifyContent: 'center', gap: '6px', zIndex: 2
+                                }}>
+                                    {carouselImages.map((_, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => goToSlide(index)}
+                                            aria-label={`Go to image ${index + 1}`}
+                                            style={{
+                                                width: currentImageIndex === index ? '22px' : '7px',
+                                                height: '7px',
+                                                borderRadius: '4px',
+                                                border: 'none',
+                                                padding: 0,
+                                                cursor: 'pointer',
+                                                background: currentImageIndex === index ? '#ffffff' : 'rgba(255,255,255,0.45)',
+                                                transition: 'width 0.35s cubic-bezier(0.16,1,0.3,1), background 0.35s ease'
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
-                )}
+                </div>
             </div>
         </section>
     )
