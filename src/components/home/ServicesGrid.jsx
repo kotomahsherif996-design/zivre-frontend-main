@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { getServices } from "../../api/client";
 import LoadingSpinner from "../../common/LoadingSpinner";
+import Reveal from "../../common/Reveal";
 
 const ServicesGrid = () => {
     const [services, setServices] = useState([])
@@ -106,8 +107,8 @@ const ServicesGrid = () => {
     return (
         <section id="services" className="services zv-section zv-services">
             <div className="container">
-                <span className="zv-eyebrow zv-center">Our expertise</span>
-                <h2 className="zv-h2 zv-center">Tailored facility solutions</h2>
+                <Reveal as="span" className="zv-eyebrow zv-center" style={{ display: 'block' }}>Our expertise</Reveal>
+                <Reveal delay={1}><h2 className="zv-h2 zv-center">Tailored facility solutions</h2></Reveal>
                 <p className="section-subtitle">From HVAC to Security, Plumbing to Healthcare — a complete solution for every need.</p>
                 
                 {/* View All Services Button */}
