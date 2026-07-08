@@ -10,6 +10,7 @@ const ServicesGrid = () => {
     const [isHoveringCarousel, setIsHoveringCarousel] = useState(false)
     const [zoomActive, setZoomActive] = useState(false)
     const [hasEnteredView, setHasEnteredView] = useState(false)
+    const [imageErrors, setImageErrors] = useState({})
     const carouselWrapperRef = useRef(null)
 
     // ===== ADD YOUR IMAGES HERE =====
@@ -37,21 +38,10 @@ const ServicesGrid = () => {
         return () => clearTimeout(t)
     }, [currentImageIndex])
 
-    // Fade + rise into view the first time the carousel scrolls into the viewport
+    // Fade + rise in shortly after mount (simple and reliable — no viewport-observer edge cases)
     useEffect(() => {
-        const node = carouselWrapperRef.current
-        if (!node) return
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setHasEnteredView(true)
-                    observer.disconnect()
-                }
-            },
-            { threshold: 0.2 }
-        )
-        observer.observe(node)
-        return () => observer.disconnect()
+        const t = setTimeout(() => setHasEnteredView(true), 100)
+        return () => clearTimeout(t)
     }, [])
 
     // Manual navigation functions
@@ -187,6 +177,30 @@ const ServicesGrid = () => {
                         {/* Stacked images cross-fade into each other */}
                         {carouselImages.map((image, index) => {
                             const isActive = index === currentImageIndex
+                            if (imageErrors[index]) {
+                                return (
+                                    <div
+                                        key={image.src}
+                                        style={{
+                                            position: 'absolute', inset: 0,
+                                            opacity: isActive ? 1 : 0,
+                                            transition: 'opacity 1s ease',
+                                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                                            background: 'linear-gradient(135deg, #0f3b2c 0%, #10b981 140%)',
+                                            pointerEvents: 'none'
+                                        }}
+                                    >
+                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                                            <rect x="3" y="4" width="18" height="15" rx="2" />
+                                            <circle cx="8.5" cy="10" r="1.7" />
+                                            <path d="M21 16l-5.2-5.2a2 2 0 00-2.8 0L4 19" />
+                                        </svg>
+                                        <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.8rem', fontWeight: 600 }}>
+                                            Zivre Facility Services
+                                        </span>
+                                    </div>
+                                )
+                            }
                             return (
                                 <img
                                     key={image.src}
@@ -204,7 +218,10 @@ const ServicesGrid = () => {
                                         willChange: 'opacity, transform',
                                         pointerEvents: 'none'
                                     }}
-                                    onError={(e) => { e.target.style.display = 'none' }}
+                                    onError={() => {
+                                        console.error(`ServicesGrid: image failed to load — check that "${image.src}" exists in /public with this exact case (Vercel is case-sensitive).`)
+                                        setImageErrors(prev => ({ ...prev, [index]: true }))
+                                    }}
                                 />
                             )
                         })}
