@@ -206,7 +206,7 @@ const NotificationDropdown = () => {
 
   return (
     <>
-      <IconButton onClick={handleOpen}>
+      <IconButton onClick={handleOpen} sx={{ color: 'white' }}>
         <Badge badgeContent={unreadCount} color="error">
           <NotificationsIcon />
         </Badge>
